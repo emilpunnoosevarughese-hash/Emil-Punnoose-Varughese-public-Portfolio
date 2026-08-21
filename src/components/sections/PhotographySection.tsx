@@ -96,7 +96,7 @@ export function PhotographySection({ profileData }: PhotographySectionProps) {
                 </button>
               </div>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight mb-4 uppercase text-[var(--color-text-primary)]">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight mb-4 uppercase text-[var(--color-text-primary)]">
               Visual <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Narratives</span>
             </h2>
             <p className="text-[var(--color-text-muted)] text-lg md:text-xl max-w-2xl font-light tracking-wide leading-relaxed">

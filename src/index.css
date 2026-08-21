@@ -16,10 +16,10 @@
   --color-accent: var(--color-accent);
   --color-success: var(--color-success);
   
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Space Grotesk', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Mono', monospace;
-  --font-serif: 'Cinzel Decorative', serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Mono", monospace;
+  --font-serif: "Cinzel Decorative", serif;
 }
 
 
@@ -34,6 +34,7 @@
     @apply antialiased selection:bg-primary/30;
   }
 }
+
 
 
 

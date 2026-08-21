@@ -1,6 +1,6 @@
 ﻿@layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: "Inter", system-ui, -apple-system, sans-serif;
     
     /* Spacing Scale (Rem based) */
     --spacing-1: 0.25rem;
@@ -47,8 +47,9 @@
     --sl-dock-collapsed:  72px;
     --sl-dock-expanded:   220px;
     --sl-statusbar-h:     56px;
-    --sl-font-mono:       'JetBrains Mono', 'Fira Mono', monospace;
-    --sl-font-display:    'Space Grotesk', 'Inter', sans-serif;
-    --sl-font-body:       'Inter', system-ui, sans-serif;
+    --sl-font-mono:       "JetBrains Mono", "Fira Mono", monospace;
+    --sl-font-display:    "Space Grotesk", "Inter", sans-serif;
+    --sl-font-body:       "Inter", system-ui, sans-serif;
   }
 }
+

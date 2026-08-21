@@ -185,7 +185,7 @@ export function ContactSection() {
               </form>
               {/* Decorative Designer Typography Fill */}
               <div className="mt-auto pt-16 pb-4 flex flex-col items-center justify-center select-none pointer-events-none">
-                <p className="text-3xl md:text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-black/20 to-black/5 dark:from-white/40 dark:to-white/10 uppercase tracking-widest text-center leading-tight">
+                <p className="text-3xl md:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-black/20 to-black/5 dark:from-white/40 dark:to-white/10 uppercase tracking-widest text-center leading-tight">
                   I'm a Designer<br/>& Developer
                 </p>
               </div>
