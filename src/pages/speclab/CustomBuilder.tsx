@@ -210,7 +210,7 @@ export function CustomBuilder() {
                       </div>
                       <div className="text-right flex items-center gap-4">
                         <div className="text-lg font-bold text-green-500">
-                            {item.price_inr ? "₹${item.price_inr.toLocaleString('en-IN')}" : 'Price N/A'}
+                          {item.price_inr ? `₹${item.price_inr.toLocaleString('en-IN')}` : 'Price N/A'}
                         </div>
                         <ChevronRight className="text-gray-400" />
                       </div>
@@ -277,6 +277,8 @@ export function CustomBuilder() {
     </div>
   );
 }
+
+
 
 
 

@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Check, X, AlertTriangle, ArrowRight, ArrowLeft, RefreshCw, Cpu, HardDrive, Zap, CircuitBoard, MemoryStick } from 'lucide-react';
 import type { HardwareProduct } from '../../types/speclab';
 import { SpecLabShell } from '../../components/speclab/layout/SpecLabShell';
@@ -106,7 +106,7 @@ export function CompatibilityChecker() {
                       </div>
                       {(p as any).price_inr && (
                         <span className="text-sm tabular-nums" style={{ color: 'var(--sl-accent-copper)', fontFamily: 'var(--sl-font-mono)' }}>
-                          â‚¹{((p as any).price_inr || 0).toLocaleString('en-IN')}
+                          ₹{((p as any).price_inr || 0).toLocaleString('en-IN')}
                         </span>
                       )}
                     </button>
@@ -184,7 +184,7 @@ export function CompatibilityChecker() {
                 <div className="mt-4 pt-3 border-t flex justify-between items-center" style={{ borderColor: 'var(--sl-border)' }}>
                   <span className="text-xs" style={{ color: 'var(--sl-text-muted)', fontFamily: 'var(--sl-font-mono)' }}>EST. TOTAL</span>
                   <span className="text-lg font-bold tabular-nums" style={{ color: 'var(--sl-accent-copper)', fontFamily: 'var(--sl-font-mono)' }}>
-                    â‚¹{Object.values(selections).reduce((s, p) => s + ((p as any)?.price_inr || 0), 0).toLocaleString('en-IN')}
+                    ₹{Object.values(selections).reduce((s, p) => s + ((p as any)?.price_inr || 0), 0).toLocaleString('en-IN')}
                   </span>
                 </div>
               </SpecPanel>
