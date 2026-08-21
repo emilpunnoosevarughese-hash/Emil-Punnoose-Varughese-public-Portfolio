@@ -135,7 +135,7 @@ export function CustomBuilder() {
                     style={{ borderColor: currentStep === step.id ? '#3b82f6' : 'var(--sl-border)' }}
                     onClick={() => setCurrentStep(step.id)}
                   >
-                    <div className={`p-2 rounded bg-black/5 dark:bg-white/5`}>
+                    <div className={`p-2 rounded bg-black/5 `}>
                       <step.icon size={18} className={currentStep === step.id ? 'text-blue-500' : ''} />
                     </div>
                     <div className="flex-1">
@@ -238,7 +238,7 @@ export function CustomBuilder() {
                     <div className="text-2xl font-bold">{evaluation.type}</div>
                   </div>
 
-                  <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border text-lg leading-relaxed mb-6" style={{ borderColor: 'var(--sl-border)' }}>
+                  <div className="p-5 rounded-xl bg-black/5  border text-lg leading-relaxed mb-6" style={{ borderColor: 'var(--sl-border)' }}>
                     {evaluation.evalText}
                   </div>
 
@@ -260,7 +260,7 @@ export function CustomBuilder() {
                     <p className="text-sm" style={{ color: 'var(--sl-text-muted)' }}>Save this list or check part compatibility next.</p>
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => setCurrentStep('cpu')} className="px-4 py-2 rounded border font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors" style={{ borderColor: 'var(--sl-border)' }}>
+                    <button onClick={() => setCurrentStep('cpu')} className="px-4 py-2 rounded border font-medium hover:bg-black/5  transition-colors" style={{ borderColor: 'var(--sl-border)' }}>
                       Edit Parts
                     </button>
                     <button onClick={() => window.location.href='/speclab/compatibility'} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold transition-colors">
@@ -277,6 +277,7 @@ export function CustomBuilder() {
     </div>
   );
 }
+
 
 
 

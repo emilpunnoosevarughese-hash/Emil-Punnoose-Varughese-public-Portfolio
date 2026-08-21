@@ -203,7 +203,7 @@ export function SpecLabProduct() {
                 {product.category}
               </span>
               {product.verified && (
-                <span className="flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
+                <span className="flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-100  px-3 py-1 rounded-full">
                   <ShieldCheck size={14} /> Verified Data
                 </span>
               )}
@@ -221,7 +221,7 @@ export function SpecLabProduct() {
             {product.features && product.features.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
                 {product.features.map((feature, idx) => (
-                  <span key={idx} className="px-3 py-1 text-sm font-medium rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                  <span key={idx} className="px-3 py-1 text-sm font-medium rounded-full bg-blue-500/10 text-blue-600  border border-blue-500/20">
                     {feature}
                   </span>
                 ))}
@@ -229,7 +229,7 @@ export function SpecLabProduct() {
             )}
 
             {(product.game_support || product.windows_support || product.linux_support) && (
-              <div className="grid grid-cols-1 gap-3 mt-6 p-4 rounded-xl bg-black/5 dark:bg-white/5 border" style={{ borderColor: 'var(--sl-border)' }}>
+              <div className="grid grid-cols-1 gap-3 mt-6 p-4 rounded-xl bg-black/5  border" style={{ borderColor: 'var(--sl-border)' }}>
                 {product.game_support && (
                   <div>
                     <h4 className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--sl-text-muted)' }}>Gaming Capabilities</h4>
@@ -390,7 +390,7 @@ export function SpecLabProduct() {
             <div className={`relative w-full max-w-md p-6 rounded-xl shadow-2xl border ${isDark ? 'bg-gray-900 border-white/10' : 'bg-white border-black/10'}`}>
               <button 
                 onClick={() => setIsImageModalOpen(false)}
-                className="absolute top-4 right-4 p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                className="absolute top-4 right-4 p-1 rounded-full hover:bg-black/5  transition-colors"
               >
                 <X size={20} />
               </button>
@@ -431,7 +431,7 @@ export function SpecLabProduct() {
                 {displayImage.attribution_text && (
                   <div>
                     <span className="opacity-60 block text-xs uppercase tracking-wider mb-1">Attribution</span>
-                    <div className="p-3 bg-black/5 dark:bg-white/5 rounded-lg border border-black/10 dark:border-white/10 text-xs font-mono break-words">
+                    <div className="p-3 bg-black/5  rounded-lg border border-black/10  text-xs font-mono break-words">
                       {displayImage.attribution_text}
                     </div>
                   </div>
@@ -472,6 +472,7 @@ export function SpecLabProduct() {
 </SpecLabShell>
   );
 }
+
 
 
 

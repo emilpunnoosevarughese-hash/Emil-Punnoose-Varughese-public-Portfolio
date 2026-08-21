@@ -582,7 +582,7 @@ export function TechDetective() {
                     </ol>
                   </div>
 
-                  <div className="bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 p-4 rounded-xl flex items-start gap-3 mb-8">
+                  <div className="bg-amber-500/10 border border-amber-500/20 text-amber-700  p-4 rounded-xl flex items-start gap-3 mb-8">
                     <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <p className="text-sm">
                       Still having issues? Check manufacturer support. Never open a power supply or touch internal high-voltage components.
@@ -609,6 +609,7 @@ export function TechDetective() {
 }
 
 export default TechDetective;
+
 
 
 

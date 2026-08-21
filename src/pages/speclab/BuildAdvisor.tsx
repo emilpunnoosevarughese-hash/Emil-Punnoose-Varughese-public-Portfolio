@@ -81,16 +81,16 @@ export function BuildAdvisor() {
             Tell us what you want to do, or how much you want to spend, and we'll recommend the exact hardware you need.
           </p>
 
-          <div className="inline-flex rounded-lg p-1 bg-black/5 dark:bg-white/5 border" style={{ borderColor: 'var(--sl-border)' }}>
+          <div className="inline-flex rounded-lg p-1 bg-black/5  border" style={{ borderColor: 'var(--sl-border)' }}>
             <button 
               onClick={() => { setMode('usecase'); setStep(1); }}
-              className={`px-6 py-2.5 rounded-md text-sm font-semibold transition-all ${mode === 'usecase' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              className={`px-6 py-2.5 rounded-md text-sm font-semibold transition-all ${mode === 'usecase' ? 'bg-white  shadow-sm text-blue-600 ' : 'text-gray-500 hover:text-gray-700 '}`}
             >
               Advise by Use Case
             </button>
             <button 
               onClick={() => { setMode('budget'); }}
-              className={`px-6 py-2.5 rounded-md text-sm font-semibold transition-all ${mode === 'budget' ? 'bg-white dark:bg-gray-800 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              className={`px-6 py-2.5 rounded-md text-sm font-semibold transition-all ${mode === 'budget' ? 'bg-white  shadow-sm text-green-600 ' : 'text-gray-500 hover:text-gray-700 '}`}
             >
               Advise by Budget
             </button>
@@ -167,7 +167,7 @@ export function BuildAdvisor() {
               
               <button 
                 onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-black/5 dark:hover:bg-white/5 transition-colors font-medium"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-black/5  transition-colors font-medium"
                 style={{ borderColor: 'var(--sl-border)' }}
               >
                 <ArrowDownUp size={16} />
@@ -179,10 +179,10 @@ export function BuildAdvisor() {
               {sortedBudgets.map((build) => (
                 <div key={build.id} className="flex flex-col rounded-xl border overflow-hidden transition-all hover:border-green-500/50 hover:shadow-lg" style={{ backgroundColor: 'var(--sl-bg-panel)', borderColor: 'var(--sl-border)' }}>
                   {/* Header */}
-                  <div className="p-6 border-b flex justify-between items-start bg-black/5 dark:bg-white/5" style={{ borderColor: 'var(--sl-border)' }}>
+                  <div className="p-6 border-b flex justify-between items-start bg-black/5 " style={{ borderColor: 'var(--sl-border)' }}>
                     <div>
                       <h3 className="text-2xl font-bold">{build.tier}</h3>
-                      <p className="text-xl font-semibold text-green-600 dark:text-green-400 mt-1">
+                      <p className="text-xl font-semibold text-green-600  mt-1">
                         ~ {formattedPrice(build.price_inr)}
                       </p>
                     </div>
@@ -212,7 +212,7 @@ export function BuildAdvisor() {
                     </div>
                     <div>
                       <span className="block text-xs uppercase font-bold tracking-wider mb-1" style={{ color: 'var(--sl-text-muted)' }}>Power / Case</span>
-                      <span className="font-medium text-gray-500 dark:text-gray-400">{build.power_supply} Ã¢â‚¬Â¢ {build.case}</span>
+                      <span className="font-medium text-gray-500 ">{build.power_supply} Ã¢â‚¬Â¢ {build.case}</span>
                     </div>
                   </div>
 
@@ -240,6 +240,7 @@ export function BuildAdvisor() {
 </SpecLabShell>
   );
 }
+
 
 
 
