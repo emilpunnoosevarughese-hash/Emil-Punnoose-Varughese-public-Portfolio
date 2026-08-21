@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, Search, ShieldCheck, Zap, Wrench,
@@ -55,7 +55,7 @@ export function SpecLabShell({ children }: { children: ReactNode }) {
     <div className="flex flex-col min-h-[calc(100vh-var(--nav-height))] sl-grid-bg" style={{ background: 'var(--sl-bg-substrate)' }}>
       {/* Status Bar */}
       <header
-        className="fixed top-[var(--nav-height)] left-0 right-0 z-40 flex items-center px-4 gap-4 border-b"
+        className="z-40 flex items-center px-4 gap-4 border-b shrink-0"
         style={{ height: 'var(--sl-statusbar-h)', background: 'var(--sl-bg-panel)', borderColor: 'var(--sl-border)' }}
       >
         <div className="flex items-center gap-2" style={{ minWidth: 'var(--sl-dock-collapsed)' }}>
@@ -79,10 +79,10 @@ export function SpecLabShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div className="flex flex-1" style={{ paddingTop: 'var(--sl-statusbar-h)' }}>
+      <div className="flex flex-1">
         {/* Left Dock */}
         <nav
-          className="hidden lg:flex fixed top-[calc(var(--nav-height)+var(--sl-statusbar-h))] bottom-0 left-0 z-30 flex-col overflow-y-auto overflow-x-hidden transition-all duration-200 sl-dock-scroll"
+          className="hidden lg:flex shrink-0 sticky top-0 h-[100dvh] z-30 flex-col overflow-y-auto overflow-x-hidden transition-all duration-200 sl-dock-scroll"
           style={{ width: dockW, background: 'var(--sl-bg-sidebar)' }}
           onMouseEnter={() => setExpanded(true)}
           onMouseLeave={() => { setExpanded(false); setFlyoutOpen(false); }}
@@ -154,14 +154,15 @@ export function SpecLabShell({ children }: { children: ReactNode }) {
         </nav>
 
         {/* Main canvas */}
-        <main className="flex-1 overflow-y-auto pb-16 lg:pb-0 min-h-0 transition-all duration-200"
-          style={{ paddingLeft: expanded ? dockW : 'var(--sl-dock-collapsed)', marginLeft: '0' }}>
+        <main className="flex-1 overflow-y-auto pb-16 lg:pb-0 min-h-0 transition-all duration-200">
           {children}
         </main>
       </div>
     </div>
   );
 }
+
+
 
 
 
