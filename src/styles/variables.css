@@ -1,0 +1,54 @@
+﻿@layer base {
+  :root {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    
+    /* Spacing Scale (Rem based) */
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-8: 2rem;
+    --spacing-10: 2.5rem;
+    --spacing-12: 3rem;
+    --spacing-16: 4rem;
+    --spacing-20: 5rem;
+    --spacing-24: 6rem;
+    --spacing-32: 8rem;
+
+    /* Border Radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-3xl: 2rem;
+    --radius-full: 9999px;
+
+    /* Layout */
+    --max-w-7xl: 80rem;
+    --nav-height: 4.5rem;
+
+    /* ── SpecLab Diagnostic Console Tokens (Black & White Theme) ── */
+    --sl-bg-substrate:    #F4F6F8; /* Main grid bg */
+    --sl-bg-panel:        #FFFFFF; /* Cards */
+    --sl-bg-panel-raised: #F8F9FA;
+    --sl-bg-sidebar:      #121212; /* Dark sidebar */
+    --sl-accent-signal:   #000000;
+    --sl-accent-copper:   #000000;
+    --sl-status-good:     #10B981;
+    --sl-status-caution:  #F59E0B;
+    --sl-status-critical: #EF4444;
+    --sl-text-primary:    #111827; /* Dark text for cards */
+    --sl-text-muted:      #6B7280;
+    --sl-text-inverted:   #FFFFFF; /* White text for sidebar */
+    --sl-border:          #E5E7EB;
+    --sl-dock-collapsed:  72px;
+    --sl-dock-expanded:   220px;
+    --sl-statusbar-h:     56px;
+    --sl-font-mono:       'JetBrains Mono', 'Fira Mono', monospace;
+    --sl-font-display:    'Space Grotesk', 'Inter', sans-serif;
+    --sl-font-body:       'Inter', system-ui, sans-serif;
+  }
+}

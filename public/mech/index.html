@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MECHIO — 3D Adventure</title>
+<link rel="stylesheet" href="./css/ui.css">
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.min.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <!-- 3D Overworld Map -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- 2D Platformer Container -->
+    <div id="phaser-container"></div>
+
+    <!-- UI: Top Bar -->
+    <header class="topbar">
+        <div class="logo">
+            <div class="logo-mark">M</div>
+            <div>
+                <div class="logo-text">MECHIO</div>
+                <div class="logo-sub">The Director Is Watching</div>
+            </div>
+        </div>
+        <div class="world-status">
+            <small>Current World</small>
+            <strong>Whispering Meadow</strong>
+        </div>
+        <div class="top-actions">
+            <button class="icon-button" id="settingsBtn">⚙</button>
+        </div>
+    </header>
+
+    <!-- UI: Profile -->
+    <div class="profile">
+        <div class="avatar" id="avatar">E</div>
+        <div>
+            <div class="profile-name" id="profileName">Player</div>
+            <div class="profile-progress" id="profileProgress">World 01 · 0 / 15</div>
+        </div>
+    </div>
+
+    <!-- UI: Director Message -->
+    <div class="director" id="director">
+        <div class="director-label">THE DIRECTOR</div>
+        <div class="director-message" id="directorMessage">Interesting choice.</div>
+    </div>
+
+    <!-- 3D Floating Interaction Card -->
+    <div class="interaction-card" id="interactionCard">
+        <div class="int-kicker">LEVEL DISCOVERED</div>
+        <div class="int-title" id="intLevelTitle">LEVEL 01</div>
+        <div class="int-name" id="intLevelName">Baby Steps</div>
+        <div class="int-stars" id="intStars">★★☆☆☆</div>
+        <div class="int-prompt">[ E ] ENTER</div>
+    </div>
+
+    <!-- UI: Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-button active" data-page="map">◉ MAP</button>
+        <button class="nav-button" data-page="journal">◇ JOURNAL</button>
+        <button class="nav-button" data-page="achievements">◆ ACHIEVEMENTS</button>
+        <button class="nav-button" data-page="statistics">▥ STATISTICS</button>
+    </nav>
+
+    <!-- UI: Toasts -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- UI: Generic Modal -->
+    <div class="modal-layer" id="modalLayer">
+        <div class="modal" id="modal">
+            <button class="modal-close" id="modalClose">×</button>
+            <h2 class="modal-title" id="modalTitle">Settings</h2>
+            <div class="modal-subtitle" id="modalSubtitle">Configure your experience.</div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- UI: Name Modal -->
+    <div class="modal-layer" id="nameLayer">
+        <div class="modal name-modal">
+            <div class="name-symbol">M</div>
+            <h2 class="modal-title">Before we begin...</h2>
+            <div class="modal-subtitle">What should the game call you?</div>
+            <input id="nameInput" class="name-input" maxlength="18" placeholder="Enter your name">
+            <button class="primary-button" id="saveName">CONTINUE →</button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+
+</body>
+</html>

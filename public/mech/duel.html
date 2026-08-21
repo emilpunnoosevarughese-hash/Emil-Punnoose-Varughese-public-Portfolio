@@ -1,0 +1,452 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mech Duel: Arena</title>
+<style>
+:root{--blue:#3b82f6;--blue-light:#93c5fd;--blue-glow:rgba(59,130,246,0.35);--red:#ef4444;--red-light:#fca5a5;--red-glow:rgba(239,68,68,0.35);--bg:#08080f;--surface:#111118;--surface2:#18181f;--border:#252530;--text:#e2e8f0;--muted:#64748b;--amber:#f59e0b;--purple:#a855f7;--green:#22c55e;--orange:#fb923c;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+/* HEADER */
+header{width:100%;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;}
+.logo-text{font-size:17px;font-weight:800;letter-spacing:2px;}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
+.back-btn{padding:7px 14px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s;}
+.back-btn:hover{border-color:var(--text);color:var(--text);}
+/* TURN BANNER */
+#turn-banner{width:100%;padding:9px 20px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:13px;font-weight:700;letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0;transition:background .4s;}
+.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+/* LAYOUT */
+main{flex:1;display:flex;gap:14px;padding:14px;width:100%;max-width:1180px;align-items:flex-start;min-height:0;}
+/* PANELS */
+.panel{width:185px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;transition:border-color .3s,box-shadow .3s;}
+.card.a1{border-color:var(--blue);box-shadow:0 0 18px var(--blue-glow);}
+.card.a2{border-color:var(--red);box-shadow:0 0 18px var(--red-glow);}
+.card.dim{opacity:0.55;}
+.mname{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.mname.b{color:var(--blue);} .mname.r{color:var(--red);}
+.hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.hlbl{font-size:11px;color:var(--muted);} .hval{font-size:13px;font-weight:700;}
+.hbg{width:100%;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
+.hbar{height:100%;border-radius:4px;transition:width .4s ease;}
+.hbar.b{background:linear-gradient(90deg,#1d4ed8,var(--blue));}
+.hbar.r{background:linear-gradient(90deg,#b91c1c,var(--red));}
+.hbar.low{background:linear-gradient(90deg,#7f1d1d,#f87171)!important;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px;}
+.sbox{background:var(--surface2);border-radius:6px;padding:5px 6px;text-align:center;}
+.sval{font-size:13px;font-weight:700;} .skey{font-size:8px;color:var(--muted);letter-spacing:1px;}
+/* ABILITY BUTTONS */
+.abs h4{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;margin-top:10px;}
+.abtn{width:100%;padding:7px 9px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;border:1px solid transparent;transition:all .2s;text-align:left;display:flex;align-items:center;gap:7px;margin-bottom:5px;background:var(--surface2);}
+.abtn:hover:not(:disabled){filter:brightness(1.25);transform:translateY(-1px);}
+.abtn:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none;}
+.abtn.sh{color:#60a5fa;border-color:rgba(96,165,250,.25);}
+.abtn.da{color:#4ade80;border-color:rgba(74,222,128,.25);}
+.abtn.bl{color:#fb923c;border-color:rgba(251,146,60,.25);}
+.cdbadge{margin-left:auto;font-size:8px;padding:1px 5px;background:rgba(255,255,255,.05);border-radius:4px;color:var(--muted);}
+.atkbtn{width:100%;padding:8px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.08);color:var(--red-light);transition:all .2s;letter-spacing:1px;margin-bottom:5px;}
+.atkbtn:hover:not(:disabled){background:rgba(239,68,68,.2);}
+.atkbtn:disabled{opacity:.3;cursor:not-allowed;}
+.endbtn{width:100%;padding:8px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all .2s;letter-spacing:1px;}
+.endbtn:hover{border-color:var(--text);color:var(--text);}
+.spill{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:2px 7px;border-radius:20px;margin-top:5px;}
+.spill.sh{background:rgba(96,165,250,.12);color:#93c5fd;}
+/* GRID */
+#gw{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;}
+#grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px;width:100%;max-width:510px;aspect-ratio:1;box-shadow:0 0 40px rgba(0,0,0,.7);}
+.cell{border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--surface2);aspect-ratio:1;transition:filter .1s,box-shadow .1s;position:relative;}
+.cell:hover{filter:brightness(1.2);}
+.cell.vm{background:rgba(34,197,94,.18);box-shadow:inset 0 0 0 1px rgba(34,197,94,.5);}
+.cell.va{background:rgba(239,68,68,.2);box-shadow:inset 0 0 0 2px rgba(239,68,68,.65);cursor:crosshair;}
+.cell.vb{background:rgba(251,146,60,.18);box-shadow:inset 0 0 0 1px rgba(251,146,60,.5);cursor:crosshair;}
+.cell.hit{animation:hitF .5s ease;}
+@keyframes hitF{0%{background:rgba(255,255,255,.6);}100%{background:var(--surface2);}}
+/* MECH TOKENS */
+.mech{width:80%;height:80%;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;user-select:none;}
+.mech.b{background:linear-gradient(145deg,#1e40af,#3b82f6,#60a5fa);box-shadow:0 2px 10px var(--blue-glow);color:#fff;}
+.mech.r{background:linear-gradient(145deg,#991b1b,#ef4444,#f87171);box-shadow:0 2px 10px var(--red-glow);color:#fff;}
+.micon{font-size:15px;line-height:1;}
+.mhp{font-size:7px;font-weight:700;margin-top:1px;opacity:.9;}
+.sring{position:absolute;inset:-4px;border-radius:9px;border:2px solid #60a5fa;animation:sp 1.6s ease-in-out infinite;}
+@keyframes sp{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.06);}}
+.selr{position:absolute;inset:-3px;border-radius:8px;border:2px solid rgba(255,255,255,.9);}
+#plbl{font-size:11px;color:var(--muted);letter-spacing:.5px;text-align:center;font-weight:600;padding:0 12px;min-height:18px;}
+/* LOG */
+.logp{width:185px;flex-shrink:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;max-height:490px;}
+.logp h4{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;flex-shrink:0;}
+#llist{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;}
+.le{font-size:10px;padding:5px 7px;border-radius:5px;border-left:3px solid;background:rgba(255,255,255,.025);line-height:1.45;word-break:break-word;}
+.le.p1{border-color:var(--blue);} .le.p2{border-color:var(--red);}
+.le.sys{border-color:var(--amber);color:var(--amber);} .le.inf{border-color:var(--muted);color:var(--muted);}
+/* GAME OVER */
+#go{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);align-items:center;justify-content:center;flex-direction:column;gap:18px;text-align:center;}
+#go.show{display:flex;}
+#got{font-size:48px;font-weight:900;letter-spacing:4px;}
+#gos{font-size:16px;color:var(--muted);}
+.rbtn{padding:13px 38px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;letter-spacing:2px;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;transition:transform .2s,box-shadow .2s;}
+.rbtn:hover{transform:scale(1.05);box-shadow:0 8px 30px rgba(59,130,246,.4);}
+/* RESPONSIVE */
+.right-col{display:flex;flex-direction:column;gap:10px;width:185px;flex-shrink:0;}
+@media(max-width:700px){main{flex-direction:column;align-items:center;} .panel,.right-col,.logp{width:100%;} #grid{max-width:380px;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">&#9881;</div>
+    <div><div class="logo-text">MECH DUEL</div><div class="logo-sub">ARENA &middot; 2-PLAYER BATTLE</div></div>
+  </div>
+  <button class="back-btn" onclick="window.history.back()">&larr; Back</button>
+</header>
+<div id="turn-banner">
+  <span class="tdot" id="bdl" style="background:#3b82f6"></span>
+  <span id="ttxt">BLUE MECH &mdash; YOUR TURN</span>
+  <span class="tdot" id="bdr" style="background:#3b82f6"></span>
+</div>
+<main>
+  <!-- P1 LEFT PANEL -->
+  <div class="panel" id="pp1">
+    <div class="card a1" id="cp1">
+      <div class="mname b">&#x2B21; BLUE MECH</div>
+      <div class="hrow"><span class="hlbl">HP</span><span class="hval" id="hv1">100 / 100</span></div>
+      <div class="hbg"><div class="hbar b" id="hb1" style="width:100%"></div></div>
+      <div class="sgrid">
+        <div class="sbox"><div class="sval" id="mv1">3</div><div class="skey">MOVES</div></div>
+        <div class="sbox"><div class="sval" id="av1">&#10003;</div><div class="skey">ATTACK</div></div>
+      </div>
+      <div id="st1"></div>
+    </div>
+    <div class="card" id="ac1">
+      <div class="abs">
+        <h4>&#9889; Abilities</h4>
+        <button class="abtn sh" id="sh1" onclick="useAb(0,'shield')">&#128737; Shield<span class="cdbadge" id="cd-sh1">READY</span></button>
+        <button class="abtn da" id="da1" onclick="useAb(0,'dash')">&#128168; Dash<span class="cdbadge" id="cd-da1">READY</span></button>
+        <button class="abtn bl" id="bl1" onclick="useAb(0,'blast')">&#128165; Blast<span class="cdbadge" id="cd-bl1">READY</span></button>
+      </div>
+      <button class="atkbtn" id="ab1" onclick="startAtk()">&#9876; ATTACK</button>
+      <button class="endbtn" onclick="endTurn()">END TURN &rarr;</button>
+    </div>
+  </div>
+
+  <!-- CENTER GRID -->
+  <div id="gw">
+    <div id="grid"></div>
+    <div id="plbl">Click your mech to select, then click a green tile to move.</div>
+  </div>
+
+  <!-- P2 RIGHT PANEL + LOG -->
+  <div class="right-col">
+    <div class="card" id="cp2">
+      <div class="mname r">&#x2B21; RED MECH</div>
+      <div class="hrow"><span class="hlbl">HP</span><span class="hval" id="hv2">100 / 100</span></div>
+      <div class="hbg"><div class="hbar r" id="hb2" style="width:100%"></div></div>
+      <div class="sgrid">
+        <div class="sbox"><div class="sval" id="mv2">3</div><div class="skey">MOVES</div></div>
+        <div class="sbox"><div class="sval" id="av2">&#10003;</div><div class="skey">ATTACK</div></div>
+      </div>
+      <div id="st2"></div>
+    </div>
+    <div class="card" id="ac2">
+      <div class="abs">
+        <h4>&#9889; Abilities</h4>
+        <button class="abtn sh" id="sh2" onclick="useAb(1,'shield')">&#128737; Shield<span class="cdbadge" id="cd-sh2">READY</span></button>
+        <button class="abtn da" id="da2" onclick="useAb(1,'dash')">&#128168; Dash<span class="cdbadge" id="cd-da2">READY</span></button>
+        <button class="abtn bl" id="bl2" onclick="useAb(1,'blast')">&#128165; Blast<span class="cdbadge" id="cd-bl2">READY</span></button>
+      </div>
+      <button class="atkbtn" id="ab2" onclick="startAtk()">&#9876; ATTACK</button>
+      <button class="endbtn" onclick="endTurn()">END TURN &rarr;</button>
+    </div>
+    <div class="logp">
+      <h4>&#128203; Battle Log</h4>
+      <div id="llist"></div>
+    </div>
+  </div>
+</main>
+<div id="go">
+  <div id="got">BLUE WINS!</div>
+  <div id="gos">The arena falls silent.</div>
+  <button class="rbtn" onclick="init()">&#9881; REMATCH</button>
+</div>
+
+<script>
+const GS=8, MHP=100, MR=3, DR=5, CD=3;
+let mechs, cp, phase, sel, bmode, gameOver;
+
+function init(){
+  mechs=[
+    {id:0,nm:'Blue Mech',p:0,r:0,c:0,hp:MHP,ml:MR,atked:false,shield:false,ab:{shield:0,dash:0,blast:0},abUsed:false},
+    {id:1,nm:'Red Mech', p:1,r:7,c:7,hp:MHP,ml:MR,atked:false,shield:false,ab:{shield:0,dash:0,blast:0},abUsed:false}
+  ];
+  cp=0; phase='move'; sel=null; bmode=false; gameOver=false;
+  render(); uiUpdate(); clearLog();
+  addLog('sys','&#9876; Battle begins! Blue Mech moves first.');
+  document.getElementById('go').classList.remove('show');
+}
+
+/* ─── RENDER GRID ─── */
+function render(){
+  const g=document.getElementById('grid'); g.innerHTML='';
+  const me=mechs[cp];
+  const vms=(phase==='move'&&sel!==null)?getMoveTiles(sel):[];
+  const vas=(phase==='attack')?getAtkTiles(me):[];
+  const vbs=bmode?getBlastZone(me):[];
+
+  for(let r=0;r<GS;r++) for(let c=0;c<GS;c++){
+    const cl=document.createElement('div');
+    cl.className='cell';
+    if((r+c)%2===0) cl.style.background='rgba(255,255,255,0.022)';
+    if(vms.some(t=>t.r===r&&t.c===c)) cl.classList.add('vm');
+    if(vas.some(t=>t.r===r&&t.c===c)) cl.classList.add('va');
+    if(vbs.some(t=>t.r===r&&t.c===c)) cl.classList.add('vb');
+
+    mechs.forEach(m=>{
+      if(m.r===r&&m.c===c){
+        const tk=document.createElement('div');
+        tk.className='mech '+(m.p===0?'b':'r');
+        tk.innerHTML='<div class="micon">'+(m.p===0?'&#129302;':'&#129470;')+'</div>'
+          +'<div class="mhp">'+m.hp+'HP</div>'
+          +(m.shield?'<div class="sring"></div>':'')
+          +(sel===m.id?'<div class="selr"></div>':'');
+        cl.appendChild(tk);
+      }
+    });
+    cl.addEventListener('click',()=>onClick(r,c));
+    g.appendChild(cl);
+  }
+  updatePhaseLabel();
+}
+
+/* ─── CLICK HANDLER ─── */
+function onClick(r,c){
+  if(gameOver) return;
+  const me=mechs[cp], en=mechs[1-cp];
+
+  // BLAST mode
+  if(bmode){
+    if(getBlastZone(me).some(t=>t.r===r&&t.c===c)) doBlast(me,en,r,c);
+    else{ bmode=false; phase='move'; addLog('inf','Blast cancelled.'); render(); }
+    return;
+  }
+
+  // ATTACK mode
+  if(phase==='attack'){
+    const tiles=getAtkTiles(me);
+    if(tiles.some(t=>t.r===r&&t.c===c)) doAttack(me,en,r,c);
+    else{ phase='move'; sel=me.id; render(); }
+    return;
+  }
+
+  // SELECT own mech
+  if(r===me.r&&c===me.c){ sel=me.id; render(); return; }
+
+  // MOVE to highlighted tile
+  if(sel!==null){
+    const tiles=getMoveTiles(sel);
+    if(tiles.some(t=>t.r===r&&t.c===c)){ doMove(me,r,c); return; }
+  }
+
+  sel=null; render();
+}
+
+/* ─── MOVEMENT ─── */
+function getMoveTiles(mid){
+  const m=mechs.find(x=>x.id===mid);
+  if(!m||m.ml<=0) return[];
+  const en=mechs.find(x=>x.id!==mid), tiles=[];
+  for(let r=0;r<GS;r++) for(let c=0;c<GS;c++){
+    const d=Math.abs(r-m.r)+Math.abs(c-m.c);
+    if(d>0&&d<=m.ml&&!(r===en.r&&c===en.c)) tiles.push({r,c});
+  }
+  return tiles;
+}
+
+function doMove(m,r,c){
+  const dist=Math.abs(r-m.r)+Math.abs(c-m.c);
+  m.ml-=dist; m.r=r; m.c=c; sel=null;
+  addLog('p'+(cp+1), m.nm+' moved to ('+r+','+c+'). Moves left: '+m.ml);
+  render(); uiUpdate();
+}
+
+/* ─── ATTACK ─── */
+function getAtkTiles(m){
+  const en=mechs[1-cp], tiles=[];
+  const dr=Math.abs(en.r-m.r), dc=Math.abs(en.c-m.c);
+  // Melee: within 1 Chebyshev distance (8-direction adjacent)
+  if(dr<=1&&dc<=1&&(dr+dc)>0) tiles.push({r:en.r,c:en.c,type:'melee'});
+  // Ranged: same row OR same col, distance 2-3
+  else if((en.r===m.r||en.c===m.c)&&(dr+dc)>=2&&(dr+dc)<=3) tiles.push({r:en.r,c:en.c,type:'ranged'});
+  return tiles;
+}
+
+function startAtk(){
+  const me=mechs[cp];
+  if(me.atked){ addLog('inf','Already attacked this turn.'); return; }
+  const tiles=getAtkTiles(me);
+  if(tiles.length===0){ addLog('inf','No targets in range! Move closer or use Blast.'); return; }
+  phase='attack'; sel=me.id; render();
+}
+
+function doAttack(at,df,r,c){
+  const tiles=getAtkTiles(at), tg=tiles.find(t=>t.r===r&&t.c===c);
+  if(!tg) return;
+  const base=ri(15,25), dmg=tg.type==='ranged'?base-5:base;
+  const icon=tg.type==='ranged'?'&#127919;':'&#9876;';
+  if(df.shield){
+    df.shield=false;
+    addLog('p'+(cp+1), icon+' '+at.nm+' attacks! '+df.nm+' SHIELD blocks '+dmg+' dmg!');
+  } else {
+    df.hp=Math.max(0,df.hp-dmg); flash(r,c);
+    addLog('p'+(cp+1), icon+(tg.type==='ranged'?' Ranged ':' Melee ')+dmg+' dmg! '+df.nm+': '+df.hp+'HP');
+  }
+  at.atked=true; phase='move'; sel=null; bmode=false;
+  checkWin(); render(); uiUpdate();
+}
+
+/* ─── ABILITIES ─── */
+function useAb(pi,ab){
+  if(pi!==cp){ addLog('inf','It is not your turn!'); return; }
+  if(gameOver) return;
+  const m=mechs[pi];
+  if(m.abUsed){ addLog('inf','Already used an ability this turn.'); return; }
+  if(m.ab[ab]>0){ addLog('inf',ab.charAt(0).toUpperCase()+ab.slice(1)+' on cooldown: '+m.ab[ab]+' more turn(s).'); return; }
+
+  if(ab==='shield'){
+    m.shield=true; m.ab.shield=CD; m.abUsed=true;
+    addLog('p'+(pi+1),'&#128737; '+m.nm+' activates SHIELD! Next attack blocked.');
+  } else if(ab==='dash'){
+    m.ml=Math.max(m.ml,DR); m.ab.dash=CD; m.abUsed=true; sel=m.id;
+    addLog('p'+(pi+1),'&#128168; '+m.nm+' DASH! Move range extended to 5.');
+  } else if(ab==='blast'){
+    bmode=true; phase='blast'; m.ab.blast=CD; m.abUsed=true;
+    addLog('p'+(pi+1),'&#128165; '+m.nm+' charges OVERHEAT BLAST! Select a target tile near the enemy.');
+  }
+  render(); uiUpdate();
+}
+
+function getBlastZone(m){
+  const en=mechs[1-cp], tiles=[];
+  for(let r=0;r<GS;r++) for(let c=0;c<GS;c++)
+    if(Math.abs(r-en.r)+Math.abs(c-en.c)<=2) tiles.push({r,c});
+  return tiles;
+}
+
+function doBlast(at,df,tr,tc){
+  let hit=false;
+  for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+    const r=tr+dr, c=tc+dc;
+    if(r<0||r>=GS||c<0||c>=GS) continue;
+    if(r===df.r&&c===df.c){ hit=true; flash(r,c); }
+  }
+  if(hit){
+    if(df.shield){ df.shield=false; addLog('p'+(cp+1),'&#128165; Blast! '+df.nm+' SHIELD absorbs the explosion!'); }
+    else{ df.hp=Math.max(0,df.hp-10); addLog('p'+(cp+1),'&#128165; OVERHEAT BLAST hits '+df.nm+' for 10 dmg! HP: '+df.hp); }
+  } else { addLog('inf','&#128165; Blast detonated but missed the enemy!'); }
+  at.hp=Math.max(0,at.hp-5);
+  addLog('p'+(cp+1),'&#128293; Overheat! '+at.nm+' takes 5 self-damage. HP: '+at.hp);
+  bmode=false; phase='move'; at.atked=true; sel=null;
+  checkWin(); render(); uiUpdate();
+}
+
+/* ─── TURN END ─── */
+function endTurn(){
+  if(gameOver) return;
+  const me=mechs[cp];
+  // Tick down cooldowns
+  for(const a in me.ab) if(me.ab[a]>0) me.ab[a]--;
+  cp=1-cp;
+  const nx=mechs[cp];
+  nx.ml=MR; nx.atked=false; nx.abUsed=false;
+  phase='move'; sel=null; bmode=false;
+  addLog('sys','&#9135;&#9135; '+nx.nm.toUpperCase()+"'S TURN &#9135;&#9135;");
+  render(); uiUpdate();
+}
+
+/* ─── WIN CHECK ─── */
+function checkWin(){
+  mechs.forEach(m=>{
+    if(m.hp<=0){
+      const w=mechs.find(x=>x.id!==m.id);
+      gameOver=true;
+      document.getElementById('got').textContent=w.nm.toUpperCase()+' WINS!';
+      document.getElementById('got').style.color=w.p===0?'#3b82f6':'#ef4444';
+      document.getElementById('gos').textContent=m.nm+' has been defeated. The arena falls silent.';
+      document.getElementById('go').classList.add('show');
+    }
+  });
+}
+
+/* ─── UI UPDATE ─── */
+function uiUpdate(){
+  mechs.forEach(m=>{
+    const p=m.p+1, pct=Math.max(0,(m.hp/MHP)*100);
+    document.getElementById('hv'+p).textContent=m.hp+' / '+MHP;
+    const bar=document.getElementById('hb'+p);
+    bar.style.width=pct+'%';
+    if(pct<30) bar.classList.add('low'); else bar.classList.remove('low');
+    document.getElementById('mv'+p).textContent=m.ml;
+    document.getElementById('av'+p).textContent=m.atked?'&#10007;':'&#10003;';
+    document.getElementById('st'+p).innerHTML=m.shield?'<span class="spill sh">&#128737; Shielded</span>':'';
+
+    const isMe=m.p===cp;
+    // Ability buttons
+    const pfxs={shield:'sh',dash:'da',blast:'bl'};
+    Object.keys(pfxs).forEach(a=>{
+      const pfx=pfxs[a];
+      const btn=document.getElementById(pfx+p);
+      const badge=document.getElementById('cd-'+pfx+p);
+      badge.textContent=m.ab[a]>0?'CD:'+m.ab[a]:'READY';
+      btn.disabled=!isMe||m.ab[a]>0||m.abUsed||gameOver;
+    });
+    // Attack btn
+    document.getElementById('ab'+p).disabled=!isMe||m.atked||gameOver;
+    // Dim inactive panel
+    document.getElementById('ac'+p).className='card'+(isMe?'':' dim');
+  });
+
+  // Card highlight
+  document.getElementById('cp1').className='card'+(cp===0?' a1':'');
+  document.getElementById('cp2').className='card'+(cp===1?' a2':'');
+
+  // Banner
+  const m=mechs[cp];
+  const bg=cp===0?'rgba(59,130,246,0.07)':'rgba(239,68,68,0.07)';
+  const dc=cp===0?'#3b82f6':'#ef4444';
+  document.getElementById('turn-banner').style.background=bg;
+  document.getElementById('ttxt').textContent=m.nm.toUpperCase()+' \u2014 YOUR TURN';
+  document.getElementById('ttxt').style.color=cp===0?'#93c5fd':'#fca5a5';
+  document.getElementById('bdl').style.background=dc;
+  document.getElementById('bdr').style.background=dc;
+}
+
+function updatePhaseLabel(){
+  const el=document.getElementById('plbl'), m=mechs[cp];
+  if(bmode){ el.textContent='&#128165; SELECT BLAST TARGET \u2014 click an orange tile near the enemy.'; el.style.color='#fb923c'; }
+  else if(phase==='attack'){ el.textContent='&#127919; ATTACK MODE \u2014 click the red-highlighted enemy tile!'; el.style.color='#f87171'; }
+  else if(sel!==null&&m.ml>0){ el.textContent='&#x1F7E2; Move '+m.nm+' \u2014 click a green tile ('+m.ml+' steps left).'; el.style.color='#4ade80'; }
+  else if(sel!==null&&m.ml===0){ el.textContent='Out of moves. Use Attack, Ability, or End Turn.'; el.style.color='#94a3b8'; }
+  else{ el.textContent='Click your mech ('+m.nm+') to select it.'; el.style.color='#64748b'; }
+}
+
+/* ─── HELPERS ─── */
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+function flash(r,c){
+  const cl=document.getElementById('grid').children[r*GS+c];
+  if(cl){ cl.classList.add('hit'); setTimeout(()=>cl.classList.remove('hit'),500); }
+}
+
+function addLog(cls,msg){
+  const l=document.getElementById('llist'), e=document.createElement('div');
+  e.className='le '+cls; e.innerHTML=msg; l.prepend(e);
+  while(l.children.length>35) l.removeChild(l.lastChild);
+}
+function clearLog(){ document.getElementById('llist').innerHTML=''; }
+
+init();
+</script>
+</body>
+</html>

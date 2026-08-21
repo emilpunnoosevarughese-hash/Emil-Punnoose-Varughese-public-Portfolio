@@ -1,0 +1,1856 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPEC – Fast-Paced Browser FPS | EdgeFX</title>
+  <meta name="description" content="SPEC is a next-generation browser-based multiplayer FPS game developed by EdgeFX. Play free, no download required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --black: #0A0A0A;
+      --gunmetal: #1B1B1B;
+      --charcoal: #202020;
+      --yellow: #FFC400;
+      --orange: #FF7A00;
+      --white: #FFFFFF;
+      --muted: #888888;
+      --border: rgba(255,196,0,0.15);
+    }
+    
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html { scroll-behavior: smooth; }
+    
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--yellow); border-radius: 2px; }
+
+    /* ────────────────── NAVBAR ────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 3rem;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s ease, border-color 0.4s ease;
+      border-bottom: 1px solid transparent;
+    }
+    #navbar.scrolled {
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(20px);
+      border-color: var(--border);
+    }
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: 4px;
+      text-decoration: none;
+      text-shadow: 0 0 20px rgba(255,196,0,0.5);
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--yellow); }
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
+    .btn-outline {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--yellow); color: var(--yellow); }
+    .btn-primary {
+      padding: 0.6rem 1.5rem;
+      background: var(--yellow);
+      border: none;
+      border-radius: 4px;
+      color: #000;
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255,196,0,0.3);
+    }
+    .btn-primary:hover {
+      background: var(--orange);
+      transform: translateY(-1px);
+      box-shadow: 0 0 30px rgba(255,122,0,0.5);
+    }
+
+    /* ────────────────── HERO ────────────────── */
+    #hero {
+      position: relative;
+      height: 100vh;
+      min-height: 700px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(135deg, rgba(255,122,0,0.07) 0%, transparent 50%),
+        linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.5) 50%, transparent 100%),
+        linear-gradient(to right, rgba(10,10,10,0.9) 40%, transparent 100%),
+        url('public/hero.png') center/cover no-repeat;
+    }
+    .hero-overlay-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,196,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,196,0,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridShift 20s linear infinite;
+    }
+    @keyframes gridShift { to { background-position: 60px 60px; } }
+
+    /* Particle canvas */
+    #particles-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 6rem;
+      max-width: 900px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.35rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: rgba(255,196,0,0.05);
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 2rem;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--yellow);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,196,0,0.4); }
+      50% { opacity: 0.6; box-shadow: 0 0 0 6px transparent; }
+    }
+    .hero-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(4rem, 12vw, 9rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 0.9;
+      color: var(--white);
+      text-shadow: 
+        0 0 40px rgba(255,196,0,0.2),
+        0 0 100px rgba(255,196,0,0.1);
+      animation: titleReveal 1s ease forwards;
+      opacity: 0;
+    }
+    @keyframes titleReveal {
+      from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    .hero-subtitle {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      color: var(--muted);
+      font-weight: 300;
+      letter-spacing: 0.5px;
+      line-height: 1.6;
+      max-width: 480px;
+      animation: titleReveal 1s 0.2s ease forwards;
+      opacity: 0;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+      animation: titleReveal 1s 0.4s ease forwards;
+      opacity: 0;
+    }
+    .btn-hero-primary {
+      padding: 1rem 2.5rem;
+      background: var(--yellow);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Rajdhani', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 0 30px rgba(255,196,0,0.4);
+    }
+    .btn-hero-primary:hover {
+      background: var(--orange);
+      transform: translateY(-3px);
+      box-shadow: 0 0 50px rgba(255,122,0,0.6);
+    }
+    .btn-hero-secondary {
+      padding: 1rem 2.5rem;
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 4px;
+      font-family: 'Rajdhani', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-hero-secondary:hover { border-color: var(--yellow); color: var(--yellow); }
+    .play-icon {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      animation: scrollBounce 2s infinite;
+      z-index: 10;
+    }
+    .scroll-indicator .mouse {
+      width: 22px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 11px;
+      display: flex;
+      justify-content: center;
+      padding-top: 6px;
+    }
+    .scroll-indicator .mouse::after {
+      content: '';
+      width: 3px; height: 6px;
+      background: var(--yellow);
+      border-radius: 2px;
+      animation: mouseScroll 1.5s infinite;
+    }
+    @keyframes mouseScroll {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(8px); opacity: 0; }
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-5px); }
+    }
+
+    /* ────────────────── LIVE STATUS ────────────────── */
+    .live-status-bar {
+      background: rgba(27,27,27,0.8);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      padding: 1.25rem 6rem;
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+      overflow-x: auto;
+    }
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .status-label {
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .status-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--yellow);
+    }
+    .status-value.online { color: #4ade80; }
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-dot::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 10px #4ade80;
+      animation: pulse-dot 2s infinite;
+    }
+    .status-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    /* ────────────────── SECTIONS COMMON ────────────────── */
+    section { padding: 6rem 6rem; }
+    .section-eyebrow {
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+    }
+    .section-desc {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 600px;
+      line-height: 1.7;
+    }
+    .section-header { margin-bottom: 4rem; }
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+    }
+
+    /* ────────────────── FEATURES ────────────────── */
+    #features { background: var(--gunmetal); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: rgba(32,32,32,0.8);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,196,0,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover {
+      border-color: rgba(255,196,0,0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,196,0,0.1);
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 48px; height: 48px;
+      border-radius: 8px;
+      background: rgba(255,196,0,0.1);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+      font-size: 1.4rem;
+    }
+    .feature-title {
+      font-family: 'Rajdhani', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+    .feature-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+    /* ────────────────── WEAPONS ────────────────── */
+    #weapons { background: var(--black); }
+    .weapons-tabs {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .weapon-tab {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .weapon-tab:hover, .weapon-tab.active {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      background: rgba(255,196,0,0.05);
+    }
+    .weapons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+    .weapon-card {
+      background: var(--gunmetal);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+    }
+    .weapon-card:hover {
+      border-color: rgba(255,196,0,0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    }
+    .weapon-emoji { font-size: 2.5rem; margin-bottom: 1rem; display: block; filter: drop-shadow(0 0 15px rgba(255,196,0,0.3)); }
+    .weapon-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .weapon-class { font-size: 0.75rem; color: var(--yellow); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem; }
+    .weapon-stat { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .weapon-stat-label { font-size: 0.72rem; color: var(--muted); font-family: 'Rajdhani', monospace; text-transform: uppercase; letter-spacing: 1px; }
+    .weapon-stat-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 0 0.75rem; }
+    .weapon-stat-fill { height: 100%; border-radius: 2px; background: var(--yellow); }
+
+    /* ────────────────── MAPS ────────────────── */
+    #maps { background: var(--charcoal); }
+    .maps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .map-card {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: all 0.4s;
+      cursor: pointer;
+    }
+    .map-card:hover { border-color: var(--yellow); transform: scale(1.02); box-shadow: 0 20px 60px rgba(0,0,0,0.7); }
+    .map-image {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .map-image-bg {
+      position: absolute;
+      inset: 0;
+      transition: transform 0.4s;
+    }
+    .map-card:hover .map-image-bg { transform: scale(1.1); }
+    .map-info { background: var(--gunmetal); padding: 1.5rem; }
+    .map-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .map-env { color: var(--yellow); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem; }
+    .map-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .map-tag {
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-size: 0.7rem;
+      font-family: 'Rajdhani', monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ────────────────── COMPETITIVE ────────────────── */
+    #competitive { background: var(--black); }
+    .comp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+    .comp-card {
+      background: var(--gunmetal);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .comp-card:hover { border-color: var(--yellow); transform: translateY(-4px); box-shadow: 0 0 40px rgba(255,196,0,0.1); }
+    .comp-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .comp-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .comp-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    /* ────────────────── LEADERBOARD ────────────────── */
+    #leaderboards { background: var(--gunmetal); }
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .leaderboard-table th {
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .leaderboard-table td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.9rem;
+    }
+    .leaderboard-table tr:hover td { background: rgba(255,196,0,0.03); }
+    .rank-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .rank-1 { color: #FFD700; }
+    .rank-2 { color: #C0C0C0; }
+    .rank-3 { color: #CD7F32; }
+    .player-name { font-weight: 600; }
+    .player-kills { color: var(--yellow); font-family: 'Orbitron', monospace; font-weight: 700; }
+
+    /* ────────────────── COMMUNITY ────────────────── */
+    #community { background: var(--charcoal); }
+    .community-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+    .community-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 2rem 1.5rem;
+      background: var(--gunmetal);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--white);
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .community-card:hover { border-color: var(--yellow); transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .community-icon { font-size: 2rem; }
+    .community-name { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; }
+    .community-desc { font-size: 0.78rem; color: var(--muted); }
+
+    /* ────────────────── NEWS ────────────────── */
+    #news { background: var(--black); }
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .news-card {
+      background: var(--gunmetal);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .news-card:hover { border-color: rgba(255,196,0,0.4); transform: translateY(-3px); }
+    .news-card-header {
+      height: 160px;
+      background: linear-gradient(135deg, var(--charcoal), var(--black));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .news-card-body { padding: 1.5rem; }
+    .news-tag {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background: rgba(255,196,0,0.1);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-size: 0.65rem;
+      font-family: 'Rajdhani', monospace;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 0.75rem;
+    }
+    .news-title { font-weight: 700; margin-bottom: 0.5rem; font-size: 1rem; line-height: 1.4; }
+    .news-date { font-size: 0.75rem; color: var(--muted); }
+
+    /* ────────────────── DEVELOPER ────────────────── */
+    #developer {
+      background: linear-gradient(135deg, var(--gunmetal) 0%, var(--black) 100%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .dev-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .dev-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .dev-avatar {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #000;
+      flex-shrink: 0;
+    }
+    .dev-info-name { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1.1rem; }
+    .dev-info-role { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .dev-statement {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 2rem;
+    }
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .tech-pill {
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .tech-pill:hover { border-color: var(--yellow); color: var(--yellow); }
+    .roadmap { margin-top: 2rem; }
+    .roadmap-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .roadmap-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--yellow);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .roadmap-dot.done { background: var(--yellow); }
+    .roadmap-item-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+    .roadmap-item-desc { font-size: 0.8rem; color: var(--muted); }
+
+    /* ────────────────── FAQ ────────────────── */
+    #faq { background: var(--black); }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+    .faq-q {
+      width: 100%;
+      background: var(--gunmetal);
+      border: none;
+      color: var(--white);
+      text-align: left;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-family: 'Rajdhani', monospace;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+    .faq-q:hover { color: var(--yellow); }
+    .faq-q .faq-icon { font-size: 1.2rem; transition: transform 0.3s; flex-shrink: 0; }
+    .faq-q.open .faq-icon { transform: rotate(45deg); }
+    .faq-a {
+      display: none;
+      background: rgba(27,27,27,0.6);
+      padding: 1.25rem 1.5rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+    .faq-item.open .faq-a { display: block; }
+
+    /* ────────────────── FOOTER ────────────────── */
+    footer {
+      background: var(--gunmetal);
+      border-top: 1px solid var(--border);
+      padding: 4rem 6rem 2rem;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+    .footer-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: 4px;
+      margin-bottom: 1rem;
+    }
+    .footer-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.7; max-width: 300px; }
+    .footer-col-title {
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 1.25rem;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 0.6rem; }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .footer-socials { display: flex; gap: 1rem; }
+    .footer-social {
+      width: 36px; height: 36px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .footer-social:hover { border-color: var(--yellow); color: var(--yellow); }
+
+    /* ────────────────── ANIMATIONS ────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ────────────────── MOBILE NAV TOGGLE ────────────────── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
+
+    /* ────────────────── RESPONSIVE ────────────────── */
+    @media (max-width: 1024px) {
+      section { padding: 4rem 3rem; }
+      .hero-content { padding: 0 3rem; }
+      .live-status-bar { padding: 1rem 3rem; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      footer { padding: 3rem 3rem 2rem; }
+      .dev-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 768px) {
+      section { padding: 3rem 1.5rem; }
+      .hero-content { padding: 0 1.5rem; }
+      .live-status-bar { padding: 1rem 1.5rem; gap: 1.5rem; }
+      footer { padding: 3rem 1.5rem 1.5rem; }
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      #navbar { padding: 0 1.5rem; }
+      .hero-buttons { flex-direction: column; }
+      .btn-hero-primary, .btn-hero-secondary { justify-content: center; }
+    }
+
+    /* ══════════ GAME LAUNCHER MODAL ══════════ */
+    #game-launcher {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,0.98);
+      animation: glFadeIn 0.25s ease;
+    }
+    #game-launcher.open { display: flex; flex-direction: column; }
+
+    @keyframes glFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Launch screen (mode select) */
+    .gl-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #game-launcher.playing .gl-screen { display: none; }
+
+    /* Dark BG with texture */
+    .gl-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(255,196,0,0.06) 0%, transparent 70%),
+                  linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+    }
+    .gl-scanlines {
+      position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+    }
+
+    .gl-close {
+      position: absolute; top: 1.5rem; right: 2rem; z-index: 10;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      color: #fff; font-size: 1.6rem; width: 44px; height: 44px;
+      border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+      line-height: 1;
+    }
+    .gl-close:hover { background: rgba(255,80,80,0.2); border-color: rgba(255,80,80,0.4); }
+
+    .gl-content {
+      position: relative; z-index: 5;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2rem; text-align: center; padding: 2rem;
+      max-width: 800px; width: 100%;
+    }
+
+    .gl-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem; font-weight: 900;
+      letter-spacing: 6px; color: var(--yellow);
+      text-shadow: 0 0 20px rgba(255,196,0,0.5);
+    }
+    .gl-logo span { color: #fff; }
+
+    .gl-badge {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--yellow); border: 1px solid rgba(255,196,0,0.3);
+      padding: 4px 14px; border-radius: 2px;
+      background: rgba(255,196,0,0.06);
+      margin-bottom: 0.5rem;
+    }
+    .gl-headline {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900; color: #fff;
+      letter-spacing: 2px; line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .gl-sub {
+      font-size: 0.95rem; color: var(--muted); max-width: 500px; line-height: 1.6;
+    }
+
+    /* Game mode cards */
+    .gl-modes {
+      display: flex; gap: 1rem; width: 100%;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .gl-mode {
+      flex: 1; min-width: 160px; max-width: 200px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 1.25rem 1rem;
+      cursor: pointer; transition: all 0.25s; position: relative;
+      text-align: center;
+    }
+    .gl-mode:hover:not([style*="cursor:not-allowed"]) {
+      background: rgba(255,196,0,0.06);
+      border-color: rgba(255,196,0,0.3);
+      transform: translateY(-3px);
+    }
+    .gl-mode.active {
+      background: rgba(255,196,0,0.08);
+      border-color: rgba(255,196,0,0.5);
+      box-shadow: 0 0 20px rgba(255,196,0,0.1);
+    }
+    .gl-mode-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .gl-mode-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      letter-spacing: 1px; color: #fff;
+      text-transform: uppercase; margin-bottom: 0.3rem;
+    }
+    .gl-mode.active .gl-mode-name { color: var(--yellow); }
+    .gl-mode-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+    .gl-mode-soon {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 2px 6px; border-radius: 3px;
+    }
+
+    /* Launch button */
+    .gl-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .gl-launch-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 3rem; border: none; border-radius: 4px;
+      background: var(--yellow); color: #000;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem; font-weight: 900;
+      letter-spacing: 3px; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s;
+      box-shadow: 0 0 30px rgba(255,196,0,0.4);
+    }
+    .gl-launch-btn:hover {
+      background: #ffcd00;
+      box-shadow: 0 0 50px rgba(255,196,0,0.6);
+      transform: translateY(-2px) scale(1.02);
+    }
+    .gl-launch-icon { font-size: 1.1rem; }
+    .gl-cancel {
+      background: transparent; border: 1px solid rgba(255,255,255,0.15);
+      color: var(--muted); padding: 0.9rem 2rem; border-radius: 4px;
+      font-family: 'Rajdhani', sans-serif; font-size: 0.85rem;
+      font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .gl-cancel:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+    .gl-specs {
+      display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center;
+      font-size: 0.7rem; color: rgba(255,255,255,0.25);
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+
+    /* Game frame (iframe full screen) */
+    .gl-frame-wrapper {
+      display: none; flex: 1; flex-direction: column; position: relative;
+    }
+    #game-launcher.playing .gl-frame-wrapper { display: flex; }
+    #game-launcher.playing .gl-screen { display: none; }
+
+    #game-frame {
+      flex: 1; width: 100%; height: calc(100vh - 46px);
+      border: none; display: block; background: #000;
+    }
+
+    /* In-game top bar */
+    .gl-ingame-bar {
+      height: 46px; background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid rgba(255,196,0,0.15);
+      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; gap: 1rem; order: -1;
+    }
+    .gl-ingame-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem; font-weight: 900;
+      letter-spacing: 4px; color: var(--yellow);
+    }
+    .gl-ingame-logo span { color: #fff; }
+    .gl-ingame-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .gl-ingame-exit {
+      background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.25);
+      color: #ff6b6b; padding: 6px 16px; border-radius: 4px;
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .gl-ingame-exit:hover { background: rgba(255,60,60,0.2); border-color: rgba(255,60,60,0.5); color: #ff4444; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ══════════ NAVBAR ══════════ -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">SPEC<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#weapons">Weapons</a></li>
+      <li><a href="#maps">Maps</a></li>
+      <li><a href="#competitive">Competitive</a></li>
+      <li><a href="#leaderboards">Leaderboards</a></li>
+      <li><a href="#community">Community</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="btn-outline">Sign In</a>
+      <a href="#" class="btn-primary" id="play-btn" onclick="openGameLauncher(event)">Play Free</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay-grid"></div>
+    <canvas id="particles-canvas"></canvas>
+    
+    <div class="hero-content">
+      <div class="hero-badge">EdgeFX · Season 1 Live Now</div>
+      <h1 class="hero-title">SPEC</h1>
+      <p class="hero-subtitle">Fast-paced browser FPS built for competitive multiplayer. No download. No limits. Just pure precision.</p>
+      <div class="hero-buttons">
+        <a href="#" class="btn-hero-primary" onclick="openGameLauncher(event)">Play Free</a>
+        <a href="#" class="btn-hero-secondary">
+          <span class="play-icon">▶</span>
+          Watch Trailer
+        </a>
+      </div>
+    </div>
+    
+    <div class="scroll-indicator">
+      <div class="mouse"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ══════════ LIVE STATUS ══════════ -->
+  <div class="live-status-bar" id="live-status">
+    <div class="status-item">
+      <span class="status-label">Server Status</span>
+      <span class="status-value online status-dot">Online</span>
+    </div>
+    <div class="status-divider"></div>
+    <div class="status-item">
+      <span class="status-label">Online Players</span>
+      <span class="status-value" id="online-players">0</span>
+    </div>
+    <div class="status-divider"></div>
+    <div class="status-item">
+      <span class="status-label">Active Matches</span>
+      <span class="status-value" id="active-matches">0</span>
+    </div>
+    <div class="status-divider"></div>
+    <div class="status-item">
+      <span class="status-label">Avg Ping</span>
+      <span class="status-value" id="avg-ping">0ms</span>
+    </div>
+    <div class="status-divider"></div>
+    <div class="status-item">
+      <span class="status-label">Region</span>
+      <span class="status-value">Global</span>
+    </div>
+    <div class="status-divider"></div>
+    <div class="status-item">
+      <span class="status-label">Version</span>
+      <span class="status-value">v1.0.0</span>
+    </div>
+  </div>
+
+  <!-- ══════════ FEATURES ══════════ -->
+  <section id="features">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Why SPEC</p>
+      <h2 class="section-title">Built for Competitive Play</h2>
+      <p class="section-desc">Everything you need for a premium multiplayer FPS experience, all running natively in your browser.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">🌐</div>
+        <h3 class="feature-title">Browser Native</h3>
+        <p class="feature-desc">Zero downloads required. Open your browser and start playing instantly on any device.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🎮</div>
+        <h3 class="feature-title">Cross Platform</h3>
+        <p class="feature-desc">Windows, Mac, and Linux. Seamless cross-platform multiplayer with no compatibility issues.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">🏆</div>
+        <h3 class="feature-title">Competitive Ranked</h3>
+        <p class="feature-desc">Full ranked matchmaking with seasons, ELO system, and global leaderboards.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎤</div>
+        <h3 class="feature-title">Voice Chat</h3>
+        <p class="feature-desc">Built-in proximity and team voice chat with noise suppression and spatial audio.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">☁️</div>
+        <h3 class="feature-title">Cloud Profiles</h3>
+        <p class="feature-desc">All your stats, skins, and progress synced across all devices through your EdgeFX account.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🗺️</div>
+        <h3 class="feature-title">Multiple Maps</h3>
+        <p class="feature-desc">Diverse tactical environments from urban close-quarters to open terrain sniping.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">🔫</div>
+        <h3 class="feature-title">Weapon Customization</h3>
+        <p class="feature-desc">Deep attachment system with scopes, barrels, grips, stocks, and aesthetic skins.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">👥</div>
+        <h3 class="feature-title">Friends System</h3>
+        <p class="feature-desc">Add friends, form squads, track stats, and compete together in custom lobbies.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">🔒</div>
+        <h3 class="feature-title">Secure Accounts</h3>
+        <p class="feature-desc">Two-factor authentication and anti-cheat powered by EdgeFX Security Engine.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ WEAPONS ══════════ -->
+  <section id="weapons">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Arsenal</p>
+      <h2 class="section-title">Weapons Showcase</h2>
+      <p class="section-desc">Master your loadout with dozens of real-feeling weapons and deep customization.</p>
+    </div>
+    <div class="weapons-tabs">
+      <button class="weapon-tab active" data-cat="ar">Assault Rifles</button>
+      <button class="weapon-tab" data-cat="smg">SMGs</button>
+      <button class="weapon-tab" data-cat="sniper">Snipers</button>
+      <button class="weapon-tab" data-cat="shotgun">Shotguns</button>
+      <button class="weapon-tab" data-cat="pistol">Pistols</button>
+    </div>
+    <div class="weapons-grid" id="weapons-grid">
+      <!-- Populated via JS -->
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ MAPS ══════════ -->
+  <section id="maps">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Battlegrounds</p>
+      <h2 class="section-title">Maps Preview</h2>
+      <p class="section-desc">Fight across iconic tactical environments, each with unique flow and vertical depth.</p>
+    </div>
+    <div class="maps-grid">
+      <div class="map-card reveal reveal-delay-1">
+        <div class="map-image" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
+          <span style="z-index:1;position:relative">🏙️</span>
+          <div class="map-image-bg" style="background:linear-gradient(135deg,#1a1a2e,#16213e);opacity:0.8"></div>
+        </div>
+        <div class="map-info">
+          <h3 class="map-name">HIGHRISE</h3>
+          <p class="map-env">Urban · Rooftop Combat</p>
+          <div class="map-tags">
+            <span class="map-tag">6v6</span>
+            <span class="map-tag">TDM</span>
+            <span class="map-tag">S&D</span>
+            <span class="map-tag">Hard</span>
+          </div>
+        </div>
+      </div>
+      <div class="map-card reveal reveal-delay-2">
+        <div class="map-image" style="background: linear-gradient(135deg,#1b2838,#2a475e);">
+          <span style="z-index:1;position:relative">🏜️</span>
+          <div class="map-image-bg" style="background:linear-gradient(135deg,#2c1810,#4a2c1a);opacity:0.8"></div>
+        </div>
+        <div class="map-info">
+          <h3 class="map-name">SANDSTORM</h3>
+          <p class="map-env">Desert · Long Range</p>
+          <div class="map-tags">
+            <span class="map-tag">8v8</span>
+            <span class="map-tag">FFA</span>
+            <span class="map-tag">Medium</span>
+          </div>
+        </div>
+      </div>
+      <div class="map-card reveal reveal-delay-3">
+        <div class="map-image" style="background: linear-gradient(135deg,#0d1b0d,#1a3a1a);">
+          <span style="z-index:1;position:relative">🌲</span>
+          <div class="map-image-bg" style="background:linear-gradient(135deg,#0d1b0d,#1a3a1a);opacity:0.8"></div>
+        </div>
+        <div class="map-info">
+          <h3 class="map-name">RECON</h3>
+          <p class="map-env">Forest · Stealth</p>
+          <div class="map-tags">
+            <span class="map-tag">5v5</span>
+            <span class="map-tag">Ranked</span>
+            <span class="map-tag">Easy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ COMPETITIVE ══════════ -->
+  <section id="competitive">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Game Modes</p>
+      <h2 class="section-title">Compete Your Way</h2>
+      <p class="section-desc">From casual warmup to full competitive ranked ladders — SPEC has a mode for every playstyle.</p>
+    </div>
+    <div class="comp-grid">
+      <div class="comp-card reveal">
+        <div class="comp-icon">🏅</div>
+        <h3 class="comp-title">Ranked Mode</h3>
+        <p class="comp-desc">ELO-based matchmaking with seasonal ladders and exclusive rewards.</p>
+      </div>
+      <div class="comp-card reveal reveal-delay-1">
+        <div class="comp-icon">🎮</div>
+        <h3 class="comp-title">Casual Mode</h3>
+        <p class="comp-desc">Drop in, drop out. Relaxed gameplay with no rank impact.</p>
+      </div>
+      <div class="comp-card reveal reveal-delay-2">
+        <div class="comp-icon">💀</div>
+        <h3 class="comp-title">Team Deathmatch</h3>
+        <p class="comp-desc">First team to the kill limit wins. Classic fast-paced action.</p>
+      </div>
+      <div class="comp-card reveal reveal-delay-3">
+        <div class="comp-icon">⚡</div>
+        <h3 class="comp-title">Free For All</h3>
+        <p class="comp-desc">Every operator for themselves. Pure individual skill.</p>
+      </div>
+      <div class="comp-card reveal">
+        <div class="comp-icon">🔧</div>
+        <h3 class="comp-title">Custom Matches</h3>
+        <p class="comp-desc">Create private lobbies, set custom rules, and train with your squad.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ LEADERBOARDS ══════════ -->
+  <section id="leaderboards">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Global Rankings</p>
+      <h2 class="section-title">Leaderboards</h2>
+      <p class="section-desc">The top operators worldwide. Where do you stand?</p>
+    </div>
+    <table class="leaderboard-table reveal">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Operator</th>
+          <th>Kills</th>
+          <th>Win Rate</th>
+          <th>K/D Ratio</th>
+          <th>Rank</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body"></tbody>
+    </table>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ COMMUNITY ══════════ -->
+  <section id="community">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Join The Community</p>
+      <h2 class="section-title">Connect with SPEC</h2>
+      <p class="section-desc">Be part of a growing community of operators worldwide.</p>
+    </div>
+    <div class="community-grid">
+      <a href="#" class="community-card reveal">
+        <span class="community-icon">💬</span>
+        <span class="community-name">Discord</span>
+        <span class="community-desc">Join the official server. 12K+ members.</span>
+      </a>
+      <a href="#" class="community-card reveal reveal-delay-1">
+        <span class="community-icon">▶</span>
+        <span class="community-name">YouTube</span>
+        <span class="community-desc">Trailers, patch notes, highlights.</span>
+      </a>
+      <a href="#" class="community-card reveal reveal-delay-2">
+        <span class="community-icon">📸</span>
+        <span class="community-name">Instagram</span>
+        <span class="community-desc">Artwork, teasers, and community clips.</span>
+      </a>
+      <a href="#" class="community-card reveal reveal-delay-3">
+        <span class="community-icon">✕</span>
+        <span class="community-name">X / Twitter</span>
+        <span class="community-desc">Announcements and developer updates.</span>
+      </a>
+      <a href="#" class="community-card reveal">
+        <span class="community-icon">📝</span>
+        <span class="community-name">Dev Blog</span>
+        <span class="community-desc">Behind the scenes with EdgeFX.</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ NEWS ══════════ -->
+  <section id="news">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Latest</p>
+      <h2 class="section-title">News & Updates</h2>
+      <p class="section-desc">Stay informed with the latest patches, events, and seasons.</p>
+    </div>
+    <div class="news-grid">
+      <div class="news-card reveal">
+        <div class="news-card-header">🎖️</div>
+        <div class="news-card-body">
+          <span class="news-tag">Season 1</span>
+          <h3 class="news-title">Season 1: Operation Veil is now live!</h3>
+          <p class="news-date">July 7, 2025</p>
+        </div>
+      </div>
+      <div class="news-card reveal reveal-delay-1">
+        <div class="news-card-header">🔫</div>
+        <div class="news-card-body">
+          <span class="news-tag">Patch Notes</span>
+          <h3 class="news-title">v1.0.1 — Weapon balance adjustments and bug fixes</h3>
+          <p class="news-date">July 5, 2025</p>
+        </div>
+      </div>
+      <div class="news-card reveal reveal-delay-2">
+        <div class="news-card-header">🗺️</div>
+        <div class="news-card-body">
+          <span class="news-tag">New Map</span>
+          <h3 class="news-title">HIGHRISE is now available in all game modes</h3>
+          <p class="news-date">July 2, 2025</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ DEVELOPER ══════════ -->
+  <section id="developer">
+    <div class="dev-grid">
+      <div class="reveal">
+        <p class="section-eyebrow">About EdgeFX</p>
+        <h2 class="section-title">Built by EdgeFX</h2>
+        <div class="dev-badge">
+          <div class="dev-avatar">E</div>
+          <div>
+            <div class="dev-info-name">Emil Edgar</div>
+            <div class="dev-info-role">Lead Developer · EdgeFX</div>
+          </div>
+        </div>
+        <p class="dev-statement">"SPEC is my vision of what a browser game can be — not a compromise, not a mini-game, but a full-featured, AAA-quality competitive FPS that runs instantly in your browser tab."</p>
+        <div class="tech-stack">
+          <span class="tech-pill">WebGL</span>
+          <span class="tech-pill">React</span>
+          <span class="tech-pill">Node.js</span>
+          <span class="tech-pill">WebRTC</span>
+          <span class="tech-pill">Socket.io</span>
+          <span class="tech-pill">Three.js</span>
+          <span class="tech-pill">Firebase</span>
+          <span class="tech-pill">TypeScript</span>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <h3 style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;margin-bottom:1.5rem;color:var(--yellow);">Development Roadmap</h3>
+        <div class="roadmap">
+          <div class="roadmap-item">
+            <div class="roadmap-dot done"></div>
+            <div>
+              <div class="roadmap-item-title">Core Engine & Networking</div>
+              <div class="roadmap-item-desc">WebGL renderer, WebRTC peer connections, server authority</div>
+            </div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-dot done"></div>
+            <div>
+              <div class="roadmap-item-title">Game Modes & Matchmaking</div>
+              <div class="roadmap-item-desc">TDM, FFA, ranked queue, ELO algorithm</div>
+            </div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-dot"></div>
+            <div>
+              <div class="roadmap-item-title">Battle Pass & Cosmetics</div>
+              <div class="roadmap-item-desc">Seasonal skins, weapon charms, operator outfits</div>
+            </div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-dot"></div>
+            <div>
+              <div class="roadmap-item-title">Mobile Support</div>
+              <div class="roadmap-item-desc">Touch controls, gyroscope aiming, mobile optimization</div>
+            </div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-dot"></div>
+            <div>
+              <div class="roadmap-item-title">Clan System & Tournaments</div>
+              <div class="roadmap-item-desc">Organized competitive scene with bracket system</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ FAQ ══════════ -->
+  <section id="faq">
+    <div class="section-header reveal" style="text-align:center;max-width:600px;margin:0 auto 3rem;">
+      <p class="section-eyebrow">Got Questions?</p>
+      <h2 class="section-title">FAQ</h2>
+    </div>
+    <div style="max-width:800px;margin:0 auto;">
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="toggleFaq(this)">Is SPEC free to play? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Yes! SPEC is completely free to play. Core gameplay, all maps, and all game modes are available at no cost. Cosmetic items are available through the in-game store and Battle Pass.</div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-q" onclick="toggleFaq(this)">Does it work on mobile? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Mobile support is actively in development and on our roadmap. Currently, SPEC is optimized for desktop browsers (Chrome, Edge, Firefox). Mobile beta coming in Season 2.</div>
+      </div>
+      <div class="faq-item reveal reveal-delay-2">
+        <button class="faq-q" onclick="toggleFaq(this)">Does it support controllers? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Yes, SPEC supports Xbox and PlayStation controllers via the browser's native Gamepad API. Full controller remapping is available in the settings menu.</div>
+      </div>
+      <div class="faq-item reveal reveal-delay-3">
+        <button class="faq-q" onclick="toggleFaq(this)">Can I play with friends? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Absolutely. Use the Friends System to add anyone by their EdgeFX username, invite them to a party, and join matches together. Custom private lobbies are also available.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I report bugs or cheaters? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Use the in-game report button (press Esc → Report Player) or visit our Support page. For bug reports, please include your browser version, OS, and a description of the issue.</div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I recover my account? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Visit the Support page and use the "Recover Account" option. You'll need access to your registered email address. If you've lost access to your email, contact support directly.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">SPEC.</div>
+        <p class="footer-desc">A premium browser-based multiplayer FPS built by EdgeFX. Play free, compete globally, no download required.</p>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Game</h4>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#weapons">Weapons</a></li>
+          <li><a href="#maps">Maps</a></li>
+          <li><a href="#competitive">Game Modes</a></li>
+          <li><a href="#leaderboards">Leaderboards</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Company</h4>
+        <ul class="footer-links">
+          <li><a href="#developer">About EdgeFX</a></li>
+          <li><a href="#">Developer Blog</a></li>
+          <li><a href="#">Careers (Soon)</a></li>
+          <li><a href="#">Press Kit</a></li>
+          <li><a href="#">Credits</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Support</h4>
+        <ul class="footer-links">
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 EdgeFX. All rights reserved. SPEC is a registered trademark of EdgeFX.</span>
+      <div class="footer-socials">
+        <a href="#" class="footer-social">D</a>
+        <a href="#" class="footer-social">▶</a>
+        <a href="#" class="footer-social">✕</a>
+        <a href="#" class="footer-social">📸</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── NAVBAR SCROLL ──
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // ── PARTICLES ──
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 1.5 + 0.3,
+        dx: (Math.random() - 0.5) * 0.3,
+        dy: -Math.random() * 0.5 - 0.1,
+        opacity: Math.random() * 0.4 + 0.1
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,196,0,${p.opacity})`;
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ── LIVE STATUS COUNTER ──
+    function animateCount(el, target, suffix='') {
+      let start = 0;
+      const step = target / 60;
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= target) { start = target; clearInterval(timer); }
+        el.textContent = Math.floor(start).toLocaleString() + suffix;
+      }, 16);
+    }
+    setTimeout(() => {
+      animateCount(document.getElementById('online-players'), 14382);
+      animateCount(document.getElementById('active-matches'), 891);
+      animateCount(document.getElementById('avg-ping'), 18, 'ms');
+    }, 500);
+
+    // ── WEAPONS DATA ──
+    const weaponsData = {
+      ar: [
+        { emoji:'🔫', name:'IRON-47', cls:'Assault Rifle', dmg:72, acc:65, rate:80, mob:60 },
+        { emoji:'🔫', name:'VEIL-16', cls:'Assault Rifle', dmg:65, acc:78, rate:75, mob:70 },
+        { emoji:'🔫', name:'REAPER-X', cls:'Assault Rifle', dmg:80, acc:58, rate:65, mob:50 },
+      ],
+      smg: [
+        { emoji:'🔫', name:'STING-9', cls:'Submachine Gun', dmg:52, acc:60, rate:92, mob:90 },
+        { emoji:'🔫', name:'FLASH-45', cls:'Submachine Gun', dmg:48, acc:55, rate:95, mob:95 },
+      ],
+      sniper: [
+        { emoji:'🔭', name:'PHANTOM-L', cls:'Sniper Rifle', dmg:98, acc:95, rate:25, mob:30 },
+        { emoji:'🔭', name:'VECTOR-7', cls:'Sniper Rifle', dmg:88, acc:90, rate:35, mob:40 },
+      ],
+      shotgun: [
+        { emoji:'💥', name:'NOVA-12', cls:'Shotgun', dmg:95, acc:30, rate:20, mob:55 },
+      ],
+      pistol: [
+        { emoji:'🔫', name:'DELTA-P', cls:'Pistol', dmg:45, acc:65, rate:60, mob:98 },
+        { emoji:'🔫', name:'APEX-1', cls:'Pistol', dmg:55, acc:72, rate:50, mob:95 },
+      ],
+    };
+
+    function renderWeapons(cat) {
+      const grid = document.getElementById('weapons-grid');
+      grid.innerHTML = weaponsData[cat].map(w => `
+        <div class="weapon-card">
+          <span class="weapon-emoji">${w.emoji}</span>
+          <div class="weapon-name">${w.name}</div>
+          <div class="weapon-class">${w.cls}</div>
+          <div class="weapon-stat">
+            <span class="weapon-stat-label">Damage</span>
+            <div class="weapon-stat-bar"><div class="weapon-stat-fill" style="width:${w.dmg}%"></div></div>
+          </div>
+          <div class="weapon-stat">
+            <span class="weapon-stat-label">Accuracy</span>
+            <div class="weapon-stat-bar"><div class="weapon-stat-fill" style="width:${w.acc}%"></div></div>
+          </div>
+          <div class="weapon-stat">
+            <span class="weapon-stat-label">Fire Rate</span>
+            <div class="weapon-stat-bar"><div class="weapon-stat-fill" style="width:${w.rate}%"></div></div>
+          </div>
+          <div class="weapon-stat">
+            <span class="weapon-stat-label">Mobility</span>
+            <div class="weapon-stat-bar"><div class="weapon-stat-fill" style="width:${w.mob}%"></div></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderWeapons('ar');
+    document.querySelectorAll('.weapon-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.weapon-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        renderWeapons(tab.dataset.cat);
+      });
+    });
+
+    // ── LEADERBOARD ──
+    const players = [
+      ['Ghost_X', 48201, '74%', '8.4', 'DIAMOND'],
+      ['VoidSnpr', 41090, '71%', '7.2', 'DIAMOND'],
+      ['EdgeKiller', 38722, '68%', '6.8', 'PLATINUM'],
+      ['PhantomEE', 34512, '65%', '5.9', 'PLATINUM'],
+      ['NightReaper', 29801, '61%', '4.8', 'GOLD'],
+      ['IronClad9', 26340, '58%', '4.1', 'GOLD'],
+      ['StrikeFast', 21089, '55%', '3.7', 'SILVER'],
+      ['SteelViper', 19003, '52%', '3.2', 'SILVER'],
+    ];
+    const tbody = document.getElementById('leaderboard-body');
+    const rankClass = ['rank-1','rank-2','rank-3'];
+    tbody.innerHTML = players.map((p, i) => `
+      <tr>
+        <td><span class="rank-num ${rankClass[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span></td>
+        <td class="player-name">${p[0]}</td>
+        <td class="player-kills">${p[1].toLocaleString()}</td>
+        <td>${p[2]}</td>
+        <td style="color:var(--muted)">${p[3]}</td>
+        <td><span style="font-size:0.75rem;font-family:'Rajdhani',monospace;letter-spacing:1px;color:var(--yellow)">${p[4]}</span></td>
+      </tr>
+    `).join('');
+
+    // ── FAQ ──
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+      document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+      if (!wasOpen) {
+        item.classList.add('open');
+        btn.classList.add('open');
+      }
+    }
+
+    // ── SCROLL REVEAL ──
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+
+    // ══════════ GAME LAUNCHER ══════════
+    function openGameLauncher(e) {
+      e && e.preventDefault();
+      document.getElementById('game-launcher').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeGameLauncher() {
+      const launcher = document.getElementById('game-launcher');
+      const frame = document.getElementById('game-frame');
+      launcher.classList.remove('open', 'playing');
+      frame.src = '';
+      document.body.style.overflow = '';
+    }
+    function launchGame() {
+      const launcher = document.getElementById('game-launcher');
+      const frame = document.getElementById('game-frame');
+      launcher.classList.add('playing');
+      frame.src = '/mech/index.html';
+    }
+    // ESC to close
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGameLauncher(); });
+  </script>
+
+  <!-- ══════════ GAME LAUNCHER MODAL ══════════ -->
+  <div id="game-launcher">
+    <!-- LAUNCH SCREEN -->
+    <div class="gl-screen" id="gl-launch-screen">
+      <button class="gl-close" onclick="closeGameLauncher()" title="Close">&times;</button>
+
+      <div class="gl-bg"></div>
+      <div class="gl-scanlines"></div>
+
+      <div class="gl-content">
+        <div class="gl-logo">SPEC<span>.</span></div>
+        <div class="gl-title-row">
+          <div class="gl-badge">&#9650; WORLD MODE</div>
+          <h2 class="gl-headline">Enter the Arena</h2>
+          <p class="gl-sub">Explore the MECH world &mdash; navigate levels, collect power-ups, and conquer the overworld.</p>
+        </div>
+
+        <div class="gl-modes">
+          <div class="gl-mode active" id="mode-world">
+            <div class="gl-mode-icon">&#127760;</div>
+            <div class="gl-mode-name">World Mode</div>
+            <div class="gl-mode-desc">Open-world exploration across 15 levels</div>
+          </div>
+          <div class="gl-mode" style="opacity:0.45;cursor:not-allowed;" title="Coming Soon">
+            <div class="gl-mode-icon">&#9876;</div>
+            <div class="gl-mode-name">Duel Arena</div>
+            <div class="gl-mode-desc">2-player tactical mech combat</div>
+            <div class="gl-mode-soon">Coming Soon</div>
+          </div>
+          <div class="gl-mode" style="opacity:0.45;cursor:not-allowed;" title="Coming Soon">
+            <div class="gl-mode-icon">&#128202;</div>
+            <div class="gl-mode-name">Ranked</div>
+            <div class="gl-mode-desc">Competitive leaderboard matches</div>
+            <div class="gl-mode-soon">Coming Soon</div>
+          </div>
+        </div>
+
+        <div class="gl-actions">
+          <button class="gl-launch-btn" onclick="launchGame()">
+            <span class="gl-launch-icon">&#9654;</span>
+            LAUNCH GAME
+          </button>
+          <button class="gl-cancel" onclick="closeGameLauncher()">Cancel</button>
+        </div>
+
+        <div class="gl-specs">
+          <span>&#9679; No download required</span>
+          <span>&#9679; Browser-based</span>
+          <span>&#9679; All platforms</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME FRAME -->
+    <div class="gl-frame-wrapper" id="gl-frame-wrapper">
+      <iframe id="game-frame" src="" frameborder="0" allowfullscreen allow="autoplay; fullscreen"></iframe>
+      <div class="gl-ingame-bar">
+        <span class="gl-ingame-logo">SPEC<span>.</span></span>
+        <span class="gl-ingame-label">&#127760; WORLD MODE &mdash; MECH</span>
+        <button class="gl-ingame-exit" onclick="closeGameLauncher()">&#x2715; EXIT GAME</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAdmin() {
+      // Storage rules can't easily query Firestore in all setups without custom claims.
+      // Assuming custom claim `admin: true` is set via Cloud Functions.
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /ads/{userId}/{imageId} {
+      // Anyone can read ad images (since they will be displayed on the site)
+      allow read: if true;
+      
+      // Only the authenticated advertiser can upload to their own folder
+      allow write: if request.auth != null && request.auth.uid == userId
+                   && request.resource.size < 5 * 1024 * 1024 // 5MB max
+                   && request.resource.contentType.matches('image/(png|jpeg|webp)');
+    }
+  }
+}

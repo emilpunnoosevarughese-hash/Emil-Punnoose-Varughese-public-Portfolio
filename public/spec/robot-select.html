@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPEC – Select Your Robot | EdgeFX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #e8e8eb;
+      --panel: #d5d5d9;
+      --card: rgba(235,235,238,0.88);
+      --card-active: rgba(255,255,255,0.98);
+      --border: rgba(255,255,255,0.92);
+      --border-dark: rgba(0,0,0,0.12);
+      --text: #111111;
+      --muted: #666666;
+      --yellow: #FFC400;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #fff;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+    }
+
+    /* ── SCREEN ── */
+    .screen {
+      width: 100vw; height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+    }
+
+    /* ── GAME PANEL ── */
+    .panel {
+      position: relative;
+      width: min(1240px, 98vw);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(210,210,215,0.95) 100%);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.08);
+      isolation: isolate;
+    }
+
+    /* Subtle noise texture */
+    .panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 30;
+      padding: 0 0 0 0;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      height: 40px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .back-arrow {
+      width: 50px;
+      height: 40px;
+      background: #0a0a0a;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 8% 100%, 0 70%);
+      flex-shrink: 0;
+    }
+
+    .back-label {
+      font-size: 1.4rem;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding-right: 28px;
+    }
+
+    .currency-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      height: 30px;
+      padding: 0 14px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.95);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .currency-icon {
+      font-size: 15px;
+      color: #f0b429;
+    }
+
+    .wifi-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wifi-icon svg { width: 22px; height: 22px; fill: none; stroke: #444; stroke-width: 2; }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      position: absolute;
+      top: 58px;
+      left: 16px;
+      width: 240px;
+      z-index: 20;
+    }
+
+    .classes-filter {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 30px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: rgba(0,0,0,0.5);
+    }
+
+    .classes-filter .class-tag {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .robot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    /* ── ROBOT CARD ── */
+    .robot-card {
+      position: relative;
+      width: 100%;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      padding: 6px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s;
+      clip-path: polygon(0 0, 96% 0, 100% 14%, 100% 100%, 0 100%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    }
+
+    .robot-card:hover {
+      background: rgba(255,255,255,0.94);
+      transform: translateX(2px);
+    }
+
+    .robot-card.active {
+      background: var(--card-active);
+      border-color: rgba(255,255,255,0.98);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+    .robot-card.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #111;
+    }
+
+    .robot-thumb {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      background: #ccc;
+      flex-shrink: 0;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .robot-info {
+      display: flex;
+      flex-direction: column;
+      margin-left: 10px;
+      gap: 3px;
+    }
+
+    .robot-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    .robot-id {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+
+    /* ── ADD ROBOTS ── */
+    .add-robots-btn {
+      width: 100%;
+      height: 62px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px;
+      border: 2px solid var(--border);
+      background: rgba(215,215,218,0.75);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      clip-path: polygon(0 0, 96% 0, 100% 14%, 100% 100%, 0 100%);
+      transition: background 0.15s;
+      color: var(--text);
+    }
+
+    .add-robots-btn:hover { background: rgba(230,230,233,0.9); }
+
+    .plus-box {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #111;
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    /* ── CHARACTER CENTER ── */
+    .character-stage {
+      position: absolute;
+      left: 250px;
+      right: 220px;
+      top: 30px;
+      bottom: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .character-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 24px 28px rgba(0,0,0,0.2)) drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .character-img.switching {
+      opacity: 0;
+      transform: scale(0.97) translateY(10px);
+    }
+
+    /* ── RIGHT STATS ── */
+    .stats-panel {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      width: 210px;
+      z-index: 20;
+    }
+
+    .level-block {
+      position: relative;
+      margin-bottom: 6px;
+    }
+
+    .level-number {
+      font-size: 74px;
+      line-height: 0.85;
+      font-weight: 300;
+      letter-spacing: -4px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .level-tag {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 8px;
+      border: 1.5px solid #111;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+    }
+
+    .class-name {
+      position: absolute;
+      top: 6px;
+      left: 105px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .class-rank {
+      position: absolute;
+      top: 34px;
+      left: 105px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .class-rank b { color: var(--text); }
+
+    /* ── STATS ── */
+    .stats-list {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stat-row {}
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #222;
+    }
+
+    .stat-bar-track {
+      position: relative;
+      width: 100%;
+      height: 2.5px;
+      background: rgba(0,0,0,0.15);
+    }
+
+    .stat-bar-fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      background: #111;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ── SKILLS ── */
+    .skills-label {
+      margin-top: 16px;
+      font-size: 9.5px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .skills-grid {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .skill-box {
+      width: 42px;
+      height: 42px;
+      background: #5f5f62;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.15s;
+      clip-path: polygon(0 0, 90% 0, 100% 10%, 100% 100%, 0 100%);
+    }
+
+    .skill-box:hover { background: #444; }
+
+    .skill-box img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      filter: brightness(0) invert(1) opacity(0.85);
+    }
+
+    /* ── START BUTTON ── */
+    .start-btn {
+      position: absolute;
+      right: 20px;
+      bottom: 18px;
+      width: 240px;
+      height: 54px;
+      background: #545457;
+      border: 2px solid #111;
+      clip-path: polygon(0 0, 96% 0, 100% 18%, 100% 100%, 0 100%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      cursor: pointer;
+      z-index: 50;
+      transition: background 0.2s, transform 0.1s;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .start-btn:hover { background: #3a3a3c; }
+    .start-btn:active { transform: scale(0.98); }
+
+    /* ── BACKGROUND ART LINES ── */
+    .bg-lines {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-lines::before {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 65%);
+    }
+
+    /* ── SELECTED ROBOT LABEL ── */
+    .selected-label {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      pointer-events: none;
+    }
+
+    .selected-label .robot-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(0,0,0,0.35);
+    }
+
+    /* ── TRANSITION OVERLAY ── */
+    #transition-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    #transition-overlay.active { opacity: 1; pointer-events: all; }
+  </style>
+</head>
+<body>
+
+<div id="transition-overlay"></div>
+
+<div class="screen">
+  <div class="panel" id="game-panel">
+
+    <!-- Background art -->
+    <div class="bg-lines"></div>
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <a href="index.html" class="back-btn" id="back-btn">
+        <div class="back-arrow">&#9664;</div>
+        <span class="back-label">Your Robots</span>
+      </a>
+      <div class="topbar-right">
+        <div class="currency-badge">
+          <span class="currency-icon">◆</span>
+          <strong id="credits">2523</strong>
+        </div>
+        <div class="wifi-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M1.5 8.5C6 3.5 18 3.5 22.5 8.5" stroke-linecap="round"/>
+            <path d="M5 12.5C8.5 9 15.5 9 19 12.5" stroke-linecap="round"/>
+            <path d="M8.5 16.5C10.2 14.8 13.8 14.8 15.5 16.5" stroke-linecap="round"/>
+            <circle cx="12" cy="20" r="1.2" fill="#444" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- LEFT PANEL -->
+    <aside class="left-panel">
+      <div class="classes-filter">
+        <span>CLASSES</span>
+        <span class="class-tag">S</span>
+        <span style="color:#aaa">—</span>
+        <span class="class-tag">A</span>
+      </div>
+
+      <div class="robot-list" id="robot-list">
+        <!-- Populated by JS -->
+      </div>
+
+      <button class="add-robots-btn">
+        <span>ADD ROBOTS</span>
+        <div class="plus-box">+</div>
+      </button>
+    </aside>
+
+    <!-- CHARACTER CENTER -->
+    <section class="character-stage">
+      <img class="character-img" id="character-img" src="" alt="Robot Character" />
+    </section>
+
+    <!-- RIGHT STATS PANEL -->
+    <aside class="stats-panel">
+      <div class="level-block">
+        <div class="level-number" id="stat-level">51</div>
+        <div class="level-tag">LEVEL</div>
+        <div class="class-name" id="stat-class">FIGHTER</div>
+        <div class="class-rank">Class <b id="stat-rank">S</b></div>
+      </div>
+
+      <div class="stats-list" id="stats-list">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="skills-label">Skills</div>
+      <div class="skills-grid" id="skills-grid">
+        <!-- Populated by JS -->
+      </div>
+    </aside>
+
+    <!-- START BUTTON -->
+    <button class="start-btn" id="start-btn">START</button>
+
+  </div>
+</div>
+
+<script>
+  const robots = [
+    {
+      name: "BERSERKER",
+      id: "2300.10",
+      image: "public/berserker.jpg",
+      level: 47,
+      classRank: "A",
+      className: "BERSERKER",
+      stats: [
+        ["ATTACK", 340],
+        ["DEFENCE", 60],
+        ["ACCURACY", 120],
+        ["DEXTERITY", 180],
+      ],
+      skills: ["⚡", "🔥", "💀"],
+    },
+    {
+      name: "DESTROYER",
+      id: "1747.12",
+      image: "public/destroyer.jpg",
+      level: 38,
+      classRank: "A",
+      className: "DESTROYER",
+      stats: [
+        ["ATTACK", 280],
+        ["DEFENCE", 200],
+        ["ACCURACY", 90],
+        ["DEXTERITY", 110],
+      ],
+      skills: ["🛡️", "💥", "⚙️"],
+    },
+    {
+      name: "WARRIOR",
+      id: "2347.12",
+      image: "public/warrior.jpg",
+      level: 55,
+      classRank: "S",
+      className: "WARRIOR",
+      stats: [
+        ["ATTACK", 220],
+        ["DEFENCE", 150],
+        ["ACCURACY", 200],
+        ["DEXTERITY", 230],
+      ],
+      skills: ["⚔️", "🌀", "✨"],
+    },
+    {
+      name: "FIGHTER",
+      id: "0440.01",
+      image: "public/fighter.jpg",
+      level: 51,
+      classRank: "S",
+      className: "FIGHTER",
+      stats: [
+        ["ATTACK", 260],
+        ["DEFENCE", 80],
+        ["ACCURACY", 150],
+        ["DEXTERITY", 220],
+      ],
+      skills: ["♘", "◉", "✥"],
+    },
+  ];
+
+  let selected = 3; // Default: FIGHTER
+
+  function renderList() {
+    const list = document.getElementById("robot-list");
+    list.innerHTML = robots.map((r, i) => `
+      <div class="robot-card ${i === selected ? 'active' : ''}" data-index="${i}">
+        <img class="robot-thumb" src="${r.image}" alt="${r.name}" onerror="this.style.background='#bbb'"/>
+        <div class="robot-info">
+          <span class="robot-name">${r.name}</span>
+          <span class="robot-id">Robot ${r.id}</span>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.robot-card').forEach(card => {
+      card.addEventListener('click', () => {
+        selectRobot(parseInt(card.dataset.index));
+      });
+    });
+  }
+
+  function renderStats(robot) {
+    // Stats
+    const statsList = document.getElementById("stats-list");
+    statsList.innerHTML = robot.stats.map(([name, value]) => `
+      <div class="stat-row">
+        <div class="stat-header">
+          <span>${name}</span>
+          <span>${value}</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill" style="width: 0%" data-value="${Math.min(value / 3.5, 100)}"></div>
+        </div>
+      </div>
+    `).join('');
+
+    // Animate bars in after short delay
+    setTimeout(() => {
+      statsList.querySelectorAll('.stat-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.value + '%';
+      });
+    }, 50);
+
+    // Skills
+    const skillsGrid = document.getElementById("skills-grid");
+    skillsGrid.innerHTML = robot.skills.map(s => `
+      <div class="skill-box">${s}</div>
+    `).join('');
+
+    // Level + class
+    document.getElementById("stat-level").textContent = robot.level;
+    document.getElementById("stat-class").textContent = robot.className;
+    document.getElementById("stat-rank").textContent = robot.classRank;
+  }
+
+  function selectRobot(index) {
+    if (index === selected) return;
+    selected = index;
+
+    const img = document.getElementById("character-img");
+    img.classList.add("switching");
+
+    setTimeout(() => {
+      img.src = robots[index].image;
+      img.classList.remove("switching");
+      renderStats(robots[index]);
+    }, 300);
+
+    renderList();
+  }
+
+  function init() {
+    const img = document.getElementById("character-img");
+    img.src = robots[selected].image;
+    renderList();
+    renderStats(robots[selected]);
+  }
+
+  // Back button fade transition
+  document.getElementById("back-btn").addEventListener("click", function(e) {
+    e.preventDefault();
+    const overlay = document.getElementById("transition-overlay");
+    overlay.classList.add("active");
+    setTimeout(() => { window.location.href = "index.html"; }, 420);
+  });
+
+  // START button
+  document.getElementById("start-btn").addEventListener("click", function() {
+    const robot = robots[selected];
+    const overlay = document.getElementById("transition-overlay");
+    overlay.classList.add("active");
+    
+    // Could link to actual game, for now flash and return
+    setTimeout(() => {
+      alert(`Launching with ${robot.className}!\nLevel ${robot.level} · Class ${robot.classRank}`);
+      overlay.classList.remove("active");
+    }, 300);
+  });
+
+  init();
+</script>
+</body>
+</html>

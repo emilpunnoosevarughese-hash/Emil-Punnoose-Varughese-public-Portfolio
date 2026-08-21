@@ -1,0 +1,81 @@
+:root {
+    --bg: #071018;
+    --text: #f5f7fa;
+    --muted: #91a1b2;
+    --accent: #7dd3fc;
+    --border: rgba(255,255,255,.10);
+    --border-bright: rgba(255,255,255,.18);
+    --shadow: 0 20px 60px rgba(0,0,0,.35);
+    --font: Inter, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); }
+button, input { font: inherit; }
+button { border: 0; }
+
+#app { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+#three-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; display: block; }
+#phaser-container { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 100; display: none; background: #040410; }
+
+.topbar { position: absolute; top: 18px; left: 18px; right: 18px; height: 62px; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: rgba(7,16,24,.78); border: 1px solid var(--border); border-radius: 18px; backdrop-filter: blur(18px); box-shadow: var(--shadow); }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; font-weight: 900; box-shadow: 0 6px 20px rgba(56,189,248,.25); }
+.logo-text { font-size: 18px; font-weight: 900; letter-spacing: -.03em; }
+.logo-sub { font-size: 10px; color: var(--muted); letter-spacing: .13em; text-transform: uppercase; }
+
+.world-status { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
+.world-status small { display: block; color: var(--muted); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; }
+.world-status strong { display: block; margin-top: 2px; font-size: 14px; }
+
+.top-actions { display: flex; gap: 8px; }
+.icon-button { height: 38px; padding: 0 13px; display: flex; align-items: center; gap: 7px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,.05); color: var(--text); cursor: pointer; transition: all .18s ease; }
+.icon-button:hover { transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: var(--border-bright); }
+
+.profile { position: absolute; top: 96px; left: 24px; z-index: 10; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; background: rgba(7,16,24,.72); border: 1px solid var(--border); border-radius: 14px; backdrop-filter: blur(14px); }
+.avatar { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(135deg, #fbbf24, #fb7185); color: #101010; font-weight: 900; }
+.profile-name { font-size: 12px; font-weight: 800; }
+.profile-progress { margin-top: 2px; font-size: 10px; color: var(--muted); }
+
+.director { position: absolute; top: 165px; left: 24px; z-index: 15; width: 240px; padding: 12px 14px; background: rgba(7,16,24,.76); border: 1px solid rgba(125,211,252,.16); border-radius: 12px; backdrop-filter: blur(14px); opacity: 0; transform: translateY(-8px); transition: all .3s ease; }
+.director.show { opacity: 1; transform: translateY(0); }
+.director-label { color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+.director-message { margin-top: 5px; color: var(--text); font-size: 12px; line-height: 1.45; }
+
+/* 3D Floating Interaction Card */
+.interaction-card { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 25; width: 220px; padding: 16px; background: linear-gradient(145deg, rgba(18,34,47,.86), rgba(7,16,24,.86)); border: 1px solid var(--border-bright); border-radius: 16px; box-shadow: var(--shadow); backdrop-filter: blur(10px); text-align: center; opacity: 0; transition: all 0.25s ease; pointer-events: none; flex-direction: column; gap: 6px; }
+.interaction-card.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+.int-kicker { color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .1em; }
+.int-title { font-size: 16px; font-weight: 900; }
+.int-stars { color: #facc15; font-size: 12px; letter-spacing: 2px; }
+.int-prompt { margin-top: 8px; font-size: 11px; font-weight: 800; padding: 6px; background: rgba(255,255,255,0.1); border-radius: 8px; }
+
+.bottom-nav { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 30; display: flex; gap: 5px; padding: 6px; background: rgba(7,16,24,.88); border: 1px solid var(--border); border-radius: 18px; backdrop-filter: blur(20px); box-shadow: var(--shadow); }
+.nav-button { min-width: 92px; height: 44px; padding: 0 12px; display: flex; align-items: center; justify-content: center; gap: 7px; border-radius: 12px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 800; transition: all .2s ease; }
+.nav-button:hover { color: var(--text); background: rgba(255,255,255,.05); }
+.nav-button.active { color: white; background: linear-gradient(135deg, rgba(56,189,248,.22), rgba(99,102,241,.22)); box-shadow: inset 0 0 0 1px rgba(125,211,252,.12); }
+
+.toast-container { position: absolute; right: 22px; top: 95px; z-index: 200; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { width: 280px; padding: 13px 15px; border-radius: 13px; background: rgba(10,21,31,.94); border: 1px solid var(--border-bright); box-shadow: var(--shadow); animation: toastIn .3s ease forwards; }
+.toast-title { color: var(--accent); font-size: 9px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
+.toast-text { margin-top: 4px; font-size: 12px; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(25px); } to { opacity: 1; transform: translateX(0); } }
+
+/* Modals */
+.modal-layer { position: absolute; inset: 0; z-index: 150; display: none; place-items: center; background: rgba(2,7,12,.72); backdrop-filter: blur(10px); }
+.modal-layer.open { display: grid; }
+.modal { position: relative; width: min(620px, calc(100vw - 32px)); max-height: calc(100vh - 40px); overflow: auto; padding: 26px; background: linear-gradient(145deg, #10202e, #071018); border: 1px solid var(--border-bright); border-radius: 22px; box-shadow: 0 40px 100px rgba(0,0,0,.6); }
+.modal-title { margin: 0; font-size: 25px; font-weight: 900; letter-spacing: -.04em; }
+.modal-subtitle { margin-top: 5px; color: var(--muted); font-size: 12px; }
+.modal-close { position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 9px; background: rgba(255,255,255,.06); color: var(--text); cursor: pointer; }
+.name-modal { width: min(420px, calc(100vw - 32px)); text-align: center; }
+.name-symbol { width: 58px; height: 58px; margin: 0 auto 16px; display: grid; place-items: center; border-radius: 18px; background: linear-gradient(135deg, #38bdf8, #6366f1); font-size: 25px; }
+.name-input { width: 100%; height: 48px; margin-top: 20px; padding: 0 14px; border: 1px solid var(--border-bright); border-radius: 12px; outline: none; background: rgba(255,255,255,.05); color: white; text-align: center; }
+.primary-button { width: 100%; height: 48px; margin-top: 16px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; font-size: 13px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 30px rgba(56,189,248,.16); }
+
+.menu-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-top: 20px; }
+.menu-card { padding: 16px; border-radius: 14px; border: 1px solid var(--border); background: rgba(255,255,255,.035); cursor: pointer; }
+.stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 16px; }
+.stat { padding: 10px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06); }
+.stat-label { color: var(--muted); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; }
+.stat-value { margin-top: 4px; font-size: 13px; font-weight: 800; }

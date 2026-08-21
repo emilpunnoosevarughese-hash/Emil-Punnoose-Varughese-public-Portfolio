@@ -1,0 +1,138 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Check if user is authenticated and is an admin
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Public readable collections
+    match /profile/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /projects/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /tutorials/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /socials/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /media/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /advertisers/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) && request.resource.data.status == 'ACTIVE';
+      allow update: if isOwner(uid) && request.resource.data.status == resource.data.status;
+    }
+
+    match /ads/{adId} {
+      allow read: if (resource.data.status == 'LIVE') || isAdmin() || (request.auth != null && resource.data.advertiser_id == request.auth.uid);
+      
+      allow create: if request.auth != null 
+                   && request.resource.data.advertiser_id == request.auth.uid 
+                   && request.resource.data.status == 'DRAFT';
+                   
+      allow update: if isAdmin() || (
+        request.auth != null && resource.data.advertiser_id == request.auth.uid &&
+        (resource.data.status == 'DRAFT' || resource.data.status == 'REJECTED') &&
+        (request.resource.data.status == 'DRAFT' || request.resource.data.status == 'PENDING_REVIEW') &&
+        request.resource.data.payment_status == resource.data.payment_status &&
+        request.resource.data.review_status == resource.data.review_status
+      );
+      
+      allow delete: if isAdmin() || (request.auth != null && resource.data.advertiser_id == request.auth.uid && resource.data.status == 'DRAFT');
+    }
+
+    match /ad_packages/{packageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /ad_orders/{orderId} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.advertiser_id == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.advertiser_id == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /ad_events/{eventId} {
+      // Cloud Functions handle impression/click creation using Admin SDK
+      allow read, write: if isAdmin();
+    }
+    
+    // Admin only
+    match /admins/{uid} {
+      allow read, write: if false; // Only accessible via Admin SDK or specific tight rules. Let's say false to client SDK.
+    }
+    
+    // Activity Logs: Admin ONLY
+    match /activityLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+    // ── SpecLab Hardware Intelligence Platform ────────────────────────────────
+    // Manufacturers: public read, admin write
+    match /hardware_manufacturers/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // Hardware products: public read, admin write
+    match /hardware_products/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // Hardware specs: public read, admin write
+    match /hardware_specs/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // Compatibility rules: public read, admin write
+    match /compatibility_rules/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // ── SpecLab Provenance System ─────────────────────────────────────────────
+    match /speclab_sources/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /speclab_specifications/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /speclab_images/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /speclab_compatibility_verified/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /speclab_corrections/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /speclab_audit_log/{document=**} {
+      allow read, write: if isAdmin();
+    }
+    match /speclab_source_monitor/{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

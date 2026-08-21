@@ -1,0 +1,85 @@
+@layer components {
+  .premium-card {
+    @apply relative overflow-hidden rounded-2xl shadow-md transition-all duration-500 hover:shadow-lg hover:-translate-y-1 hover:border-primary/50;
+  }
+  
+  .premium-button {
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-full font-medium transition-all duration-300;
+  }
+  
+  .premium-button-primary {
+    @apply bg-primary text-white hover:bg-accent hover:scale-105 shadow-[0_0_20px_rgba(0,102,255,0.3)] hover:shadow-[0_0_30px_rgba(0,212,255,0.4)];
+  }
+
+  .premium-button-secondary {
+    @apply text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] hover:scale-105;
+  }
+
+  .mac-window-header {
+    @apply h-8 border-b border-border bg-surface/50 flex items-center px-4 space-x-2 backdrop-blur-md;
+  }
+
+  .mac-dot {
+    @apply w-2.5 h-2.5 rounded-full;
+  }
+  .mac-dot.close { @apply bg-[#FF5F56]; }
+  .mac-dot.minimize { @apply bg-[#FFBD2E]; }
+  .mac-dot.maximize { @apply bg-[#27C93F]; }
+}
+/* SpecLab Animated Grid Background */
+.sl-grid-bg {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  animation: slGridMove 20s linear infinite;
+}
+
+@keyframes slGridMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+/* SpecLab Sidebar Active Item (Inverse Curve) */
+.sl-nav-item {
+  position: relative;
+  border-radius: 9999px 0 0 9999px; /* Rounded left side */
+  transition: all 0.2s ease;
+}
+
+.sl-nav-item.active {
+  background-color: var(--sl-bg-substrate);
+  color: var(--sl-text-primary) !important;
+}
+
+.sl-nav-item.active::before,
+.sl-nav-item.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background-color: transparent;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.sl-nav-item.active::before {
+  top: -20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 10px 10px 0 10px var(--sl-bg-substrate);
+}
+
+.sl-nav-item.active::after {
+  bottom: -20px;
+  border-top-right-radius: 20px;
+  box-shadow: 10px -10px 0 10px var(--sl-bg-substrate);
+}
+/* Hide scrollbar for SpecLab dock */
+.sl-dock-scroll::-webkit-scrollbar {
+  display: none;
+}
+.sl-dock-scroll {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

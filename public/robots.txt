@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emils-portfolio.web.app/sitemap.xml

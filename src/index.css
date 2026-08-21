@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=UnifrakturMaguntia&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@import "./styles/variables.css";
+@import "./styles/theme.css";
+@import "./styles/animations.css";
+@import "./styles/utilities.css";
+@import "./styles/components.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
+  --color-primary: var(--color-primary);
+  --color-accent: var(--color-accent);
+  --color-success: var(--color-success);
+  
+  --font-sans: var(--font-sans);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    transition: background-color 0.4s ease, color 0.4s ease;
+    overflow-x: hidden;
+    @apply antialiased selection:bg-primary/30;
+  }
+}
