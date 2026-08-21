@@ -1,6 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=UnifrakturMaguntia&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @import "./styles/variables.css";
 @import "./styles/theme.css";
@@ -36,5 +34,6 @@
     @apply antialiased selection:bg-primary/30;
   }
 }
+
 
 
