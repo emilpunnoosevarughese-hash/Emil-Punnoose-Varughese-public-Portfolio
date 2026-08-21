@@ -302,7 +302,7 @@ export function Tutorials() {
         transition={{ duration: 0.8, delay: 0.2, type: "spring", stiffness: 100 }}
         className="mt-16 mb-8 text-center px-4 max-w-3xl mx-auto relative z-10"
       >
-        <div className="relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 border border-white/10 bg-white/5 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,102,255,0.15)] group transition-all duration-700 hover:shadow-[0_8px_40px_rgba(0,102,255,0.25)] hover:border-white/20">
+        <div className="relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 border border-black/5 bg-black/5 dark:border-white/10 dark:bg-white/5 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,102,255,0.15)] group transition-all duration-700 hover:shadow-[0_8px_40px_rgba(0,102,255,0.25)] dark:hover:border-white/20">
           
           {/* Sweeping Light Edge */}
           <div className="absolute top-0 inset-x-0 h-[2px] w-full overflow-hidden opacity-80">
@@ -320,11 +320,11 @@ export function Tutorials() {
           <motion.p 
             animate={{ textShadow: isDark ? ['0px 0px 0px rgba(255,255,255,0)', '0px 0px 20px rgba(255,255,255,0.6)', '0px 0px 0px rgba(255,255,255,0)'] : 'none' }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className={`relative z-10 text-[15px] font-medium leading-relaxed tracking-wide ${isDark ? 'text-white/90 group-hover:text-white transition-colors duration-500' : 'text-gray-900'}`}
+            className={`relative z-10 text-[15px] font-medium leading-relaxed tracking-wide ${isDark ? 'text-white/90 group-hover:text-white transition-colors duration-500' : 'text-[var(--color-text-primary)]'}`}
           >
             The resources provided here are curated based on industry standards, developer feedback, and professional experience. 
             <br className="hidden md:block" />
-            <span className="text-white font-bold drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">Continual learning</span> is the foundation of modern engineering. Keep exploring, experimenting, and building.
+            <span className="text-orange-500 font-bold dark:drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">Continual learning</span> is the foundation of modern engineering. Keep exploring, experimenting, and building.
           </motion.p>
         </div>
       </motion.div>

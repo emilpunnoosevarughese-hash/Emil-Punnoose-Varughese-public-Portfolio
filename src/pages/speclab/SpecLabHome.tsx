@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Cpu, Monitor, HardDrive, MemoryStick, Layers, ShieldCheck, Zap, Network, Search, ChevronRight, CircuitBoard, Wrench, Image as ImageIcon, PlugZap, FlaskConical } from 'lucide-react';
@@ -39,7 +39,7 @@ export function SpecLabHome() {
       <div className="px-6 py-8 max-w-5xl mx-auto space-y-8">
         <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
           <div className="flex items-baseline gap-3 mb-1">
-            <h1 className="text-3xl font-semibold tracking-tight" style={{ fontFamily: 'var(--sl-font-display)', color: 'var(--sl-text-primary)' }}>SpecLab</h1>
+            <h1 className="text-4xl font-bold tracking-tight" style={{ fontFamily: 'var(--sl-font-display)', color: 'var(--sl-text-primary)' }}>SpecLab</h1>
             <span className="text-sm px-2 py-0.5 rounded" style={{ background: 'rgba(76,141,255,0.1)', color: 'var(--sl-accent-signal)', border: '1px solid rgba(76,141,255,0.2)', fontFamily: 'var(--sl-font-mono)' }}>v2.0</span>
           </div>
           <p className="text-sm" style={{ color: 'var(--sl-text-muted)', fontFamily: 'var(--sl-font-body)' }}>Hardware Intelligence Platform — Explore, compare, build smarter.</p>
