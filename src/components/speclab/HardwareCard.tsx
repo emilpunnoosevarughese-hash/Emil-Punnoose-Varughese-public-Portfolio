@@ -103,6 +103,15 @@ const HardwareCard: React.FC<HardwareCardProps> = ({ product, spec, onClick }) =
         </h3>
         
         {renderHighlights()}
+
+        <div className="mt-auto pt-4 flex items-end justify-between">
+          <div>
+            <span className="text-xs font-medium" style={{ color: "var(--sl-text-muted)" }}>Est. Price</span>
+            <div className="text-lg font-bold font-mono" style={{ color: "var(--sl-text-primary)" }}>
+              ${product.price_usd?.toFixed(2) || "---"}
+            </div>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

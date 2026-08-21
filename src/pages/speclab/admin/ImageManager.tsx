@@ -1,7 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Search, Image as ImageIcon, ShieldCheck, Download, AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { SpecLabShell } from '../../../components/speclab/layout/SpecLabShell';
 import { WikimediaProvider, OpenverseProvider } from '../../../lib/speclab/imageProviders';
 import type { ImageCandidate } from '../../../lib/speclab/imageProviders';
 // import { optimizeImageClientSide } from '../../../lib/speclab/imageProcessor';
@@ -93,11 +92,10 @@ export function ImageManager() {
   const allChecked = checks.correctProduct && checks.licenseReviewed && checks.usagePermitted;
 
   return (
-    <SpecLabShell>
-      <div className="min-h-screen pt-6 pb-12 px-4 sm:px-6 lg:px-8 text-[var(--sl-text-primary)]">
-        <div className="max-w-6xl mx-auto space-y-8">
-          
-          <div>
+    <div className={`min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 ${isDark ? 'bg-[var(--sl-bg-panel)] text-[var(--sl-text-primary)]' : 'bg-gray-50 text-gray-900'}`}>
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <ImageIcon className="text-blue-500" /> 
             SpecLab Image Manager
@@ -106,7 +104,7 @@ export function ImageManager() {
         </div>
 
         {/* Warning Banner */}
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600  flex gap-3">
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex gap-3">
           <AlertTriangle className="flex-shrink-0" />
           <div className="text-sm">
             <p className="font-bold mb-1">Legal Notice</p>
@@ -115,7 +113,7 @@ export function ImageManager() {
         </div>
 
         {/* Search */}
-        <div className="p-6 rounded-xl border shadow-sm" style={{ background: 'var(--sl-bg-panel)', borderColor: 'var(--sl-border)' }}>
+        <div className={`p-6 rounded-xl border shadow-sm ${isDark ? 'bg-gray-900 border-white/10' : 'bg-white border-black/10'}`}>
           <form onSubmit={handleSearch} className="flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -142,7 +140,7 @@ export function ImageManager() {
         {results.length > 0 && !selectedImage && (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {results.map(candidate => (
-              <div key={candidate.id} className="flex flex-col rounded-xl border overflow-hidden transition-all hover:shadow-lg" style={{ background: 'var(--sl-bg-panel)', borderColor: 'var(--sl-border)' }}>
+              <div key={candidate.id} className={`flex flex-col rounded-xl border overflow-hidden transition-all hover:shadow-lg ${isDark ? 'bg-gray-900 border-white/10' : 'bg-white border-black/10'}`}>
                 <div className="aspect-video bg-black/5 relative overflow-hidden flex items-center justify-center p-2">
                   <img src={candidate.thumbnail_url} alt={candidate.title} className="max-w-full max-h-full object-contain" />
                 </div>
@@ -150,9 +148,9 @@ export function ImageManager() {
                   <h3 className="font-bold text-sm line-clamp-2 mb-2" title={candidate.title}>{candidate.title}</h3>
                   
                   <div className="text-xs space-y-1 text-gray-500 mb-4 flex-1">
-                    <p><span className="font-semibold text-gray-700 ">Source:</span> {candidate.source_name}</p>
-                    <p><span className="font-semibold text-gray-700 ">Creator:</span> {candidate.creator}</p>
-                    <p><span className="font-semibold text-gray-700 ">License:</span> <span className="text-blue-500">{candidate.license}</span></p>
+                    <p><span className="font-semibold text-gray-700 dark:text-gray-300">Source:</span> {candidate.source_name}</p>
+                    <p><span className="font-semibold text-gray-700 dark:text-gray-300">Creator:</span> {candidate.creator}</p>
+                    <p><span className="font-semibold text-gray-700 dark:text-gray-300">License:</span> <span className="text-blue-500">{candidate.license}</span></p>
                   </div>
                   
                   <button 
@@ -161,7 +159,7 @@ export function ImageManager() {
                       setChecks({ correctProduct: false, licenseReviewed: false, usagePermitted: false });
                       setProcessedData(null);
                     }}
-                    className="w-full py-2 bg-black/5 hover:bg-black/10   rounded-lg font-medium text-sm transition-colors"
+                    className="w-full py-2 bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
                   >
                     Select for Verification
                   </button>
@@ -173,14 +171,14 @@ export function ImageManager() {
 
         {/* Verification Interface */}
         {selectedImage && (
-          <div className="p-8 rounded-xl border shadow-xl" style={{ background: 'var(--sl-bg-panel)', borderColor: 'var(--sl-border)' }}>
+          <div className={`p-8 rounded-xl border shadow-xl ${isDark ? 'bg-gray-900 border-white/10' : 'bg-white border-black/10'}`}>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <ShieldCheck className="text-blue-500" /> Verify Image
               </h2>
               <button 
                 onClick={() => setSelectedImage(null)}
-                className="text-sm font-medium px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10  "
+                className="text-sm font-medium px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
               >
                 Cancel / Back to Results
               </button>
@@ -188,7 +186,7 @@ export function ImageManager() {
 
             <div className="flex flex-col lg:flex-row gap-8">
               <div className="w-full lg:w-1/2 flex flex-col items-center">
-                <div className="bg-black/5 rounded-xl p-4 w-full flex items-center justify-center border border-black/10 ">
+                <div className="bg-black/5 rounded-xl p-4 w-full flex items-center justify-center border border-black/10 dark:border-white/10">
                   <img src={selectedImage.image_url} alt="Preview" className="max-w-full max-h-[400px] object-contain rounded-lg shadow-md" />
                 </div>
                 <a 
@@ -203,7 +201,7 @@ export function ImageManager() {
 
               <div className="w-full lg:w-1/2 space-y-8">
                 {/* Provenance Data */}
-                <div className="space-y-4 text-sm bg-black/5  p-6 rounded-xl border border-black/10 ">
+                <div className="space-y-4 text-sm bg-black/5 dark:bg-white/5 p-6 rounded-xl border border-black/10 dark:border-white/10">
                   <div>
                     <span className="opacity-60 block text-xs uppercase tracking-wider mb-1">Source</span>
                     <div className="font-medium">{selectedImage.source_name}</div>
@@ -224,7 +222,7 @@ export function ImageManager() {
                   </div>
                   <div>
                     <span className="opacity-60 block text-xs uppercase tracking-wider mb-1">Attribution (Auto-generated)</span>
-                    <div className="font-mono text-xs p-3 bg-black/10  rounded border border-black/10  break-words">
+                    <div className="font-mono text-xs p-3 bg-black/10 dark:bg-black/40 rounded border border-black/10 dark:border-white/10 break-words">
                       {selectedImage.attribution_text}
                     </div>
                   </div>
@@ -234,7 +232,7 @@ export function ImageManager() {
                 <div className="space-y-4">
                   <h3 className="font-bold border-b pb-2" style={{ borderColor: 'var(--sl-border)' }}>Administrator Verification</h3>
                   
-                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-black/5  transition-colors">
+                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                     <input 
                       type="checkbox" 
                       className="mt-1 w-5 h-5 rounded"
@@ -247,7 +245,7 @@ export function ImageManager() {
                     </div>
                   </label>
 
-                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-black/5  transition-colors">
+                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                     <input 
                       type="checkbox" 
                       className="mt-1 w-5 h-5 rounded"
@@ -259,7 +257,7 @@ export function ImageManager() {
                     </div>
                   </label>
 
-                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-black/5  transition-colors">
+                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                     <input 
                       type="checkbox" 
                       className="mt-1 w-5 h-5 rounded"
@@ -279,7 +277,7 @@ export function ImageManager() {
                     className={`w-full py-4 rounded-xl font-bold flex justify-center items-center gap-2 transition-all ${
                       allChecked 
                         ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20' 
-                        : 'bg-gray-300  text-gray-500 cursor-not-allowed'
+                        : 'bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed'
                     }`}
                   >
                     {isProcessing ? 'Processing Image...' : (
@@ -302,11 +300,8 @@ export function ImageManager() {
 
       </div>
       </div>
-    </SpecLabShell>
   );
 }
-
-
 
 
 

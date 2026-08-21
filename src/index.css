@@ -38,3 +38,39 @@
 
 
 
+
+@keyframes grid-move {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+.sidebar-item-active {
+  position: relative;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+}
+
+.sidebar-item-active::before,
+.sidebar-item-active::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  pointer-events: none;
+}
+
+.sidebar-item-active::before {
+  top: -40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: 20px 20px 0 0 var(--color-background);
+}
+
+.sidebar-item-active::after {
+  bottom: -40px;
+  border-top-right-radius: 40px;
+  box-shadow: 20px -20px 0 0 var(--color-background);
+}

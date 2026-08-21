@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, Search, ShieldCheck, Zap, Wrench,
@@ -47,7 +47,7 @@ function LiveClock() {
 
 export function SpecLabShell({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const dockW = expanded ? 'var(--sl-dock-expanded)' : 'var(--sl-dock-collapsed)';
 
@@ -55,7 +55,7 @@ export function SpecLabShell({ children }: { children: ReactNode }) {
     <div className="flex flex-col min-h-[calc(100vh-var(--nav-height))] sl-grid-bg" style={{ background: 'var(--sl-bg-substrate)' }}>
       {/* Status Bar */}
       <header
-        className="z-40 flex items-center px-4 gap-4 border-b shrink-0"
+        className="fixed top-[var(--nav-height)] left-0 right-0 z-40 flex items-center px-4 gap-4 border-b"
         style={{ height: 'var(--sl-statusbar-h)', background: 'var(--sl-bg-panel)', borderColor: 'var(--sl-border)' }}
       >
         <div className="flex items-center gap-2" style={{ minWidth: 'var(--sl-dock-collapsed)' }}>
@@ -79,61 +79,61 @@ export function SpecLabShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1" style={{ paddingTop: 'calc(var(--nav-height) + var(--sl-statusbar-h))' }}>
         {/* Left Dock */}
         <nav
-          className="hidden lg:flex shrink-0 sticky top-0 h-[100dvh] z-30 flex-col overflow-y-auto overflow-x-hidden transition-all duration-200 sl-dock-scroll"
-          style={{ width: dockW, background: 'var(--sl-bg-sidebar)' }}
+          className="hidden lg:flex fixed top-[calc(var(--nav-height)+var(--sl-statusbar-h))] bottom-0 left-0 z-30 flex-col border-r overflow-y-auto overflow-x-hidden transition-all duration-200"
+          style={{ width: dockW, background: 'var(--sl-bg-panel)', borderColor: 'var(--sl-border)' }}
           onMouseEnter={() => setExpanded(true)}
           onMouseLeave={() => { setExpanded(false); setFlyoutOpen(false); }}
         >
-          <div className={`flex items-center justify-center mt-4 mb-2 transition-all duration-300 ${expanded ? 'h-24' : 'h-16'}`}>
-            <div className={`bg-white flex items-center justify-center shadow-lg rounded-full flex-shrink-0 transition-all duration-300 ${expanded ? 'w-20 h-20' : 'w-10 h-10'}`}>
-              <svg viewBox="0 0 24 24" className={`text-[#121212] transition-all duration-300 ${expanded ? 'w-16 h-16' : 'w-7 h-7'}`} fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4 1.79 4 4-1.79 4-4 4-4-1.79-4-4h2c0 1.1.9 2 2 2s2-.9 2-2-2-2-4-2c-3.31 0-6-2.69-6-6s2.69-6 6-6c3.31 0 6 2.69 6 6h-2c0-2.21-1.79-4-4-4z"/>
-              </svg>
-            </div>
-          </div>
+          <button onClick={() => setExpanded(e => !e)}
+            className="flex items-center justify-center h-10 mx-2 mt-2 mb-1 rounded opacity-40 hover:opacity-80 transition-opacity"
+            style={{ color: 'var(--sl-text-muted)' }} aria-label="Toggle dock">
+            <ChevronRight size={14} className={expanded ? 'rotate-180' : ''} />
+          </button>
 
-          <div className="flex-1 px-0 py-4 space-y-1 pl-4">
-            {NAV_ITEMS.map((item, idx) => {
-              const isActive = item.path
-                ? (item.path === '/speclab' ? location.pathname === '/speclab' : location.pathname.startsWith(item.path))
-                : false;
-              const isCat = !item.path;
-              return (
-                <div key={idx} className="relative">
-                  {isCat ? (
-                    <button onClick={() => setFlyoutOpen(o => !o)}
-                      className={`sl-nav-item w-full rounded-l-full flex items-center gap-4 px-4 py-3.5 text-[13px] font-semibold tracking-wide transition-colors ${flyoutOpen ? 'active' : ''}`}
-                      style={{ color: flyoutOpen ? 'var(--sl-text-primary)' : 'var(--sl-text-inverted)' }}>
-                      <item.icon size={18} className="flex-shrink-0" />
-                      {expanded && <><span style={{ fontFamily: 'var(--sl-font-display)', textTransform: 'uppercase' }}>{item.label}</span>
-                      <ChevronRight size={14} className={`ml-auto transition-transform ${flyoutOpen ? 'rotate-90' : ''}`} /></>}
-                    </button>
-                  ) : (
-                    <Link to={item.path!}
-                      className={`sl-nav-item w-full rounded-l-full flex items-center gap-4 px-4 py-3.5 text-[13px] font-semibold tracking-wide transition-colors ${isActive ? 'active' : ''}`}
-                      style={{ color: isActive ? 'var(--sl-text-primary)' : 'var(--sl-text-inverted)' }}>
-                      <item.icon size={18} className="flex-shrink-0" />
-                      {expanded && <span style={{ fontFamily: 'var(--sl-font-display)', textTransform: 'uppercase' }}>{item.label}</span>}
-                    </Link>
-                  )}
-                  {isCat && flyoutOpen && expanded && item.flyout && (
-                    <div className="pl-10 pb-2 space-y-1 mt-1 pr-4">
-                      {item.flyout.map((f, fi) => (
-                        <Link key={fi} to={f.path}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors hover:bg-white/10"
-                          style={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--sl-font-body)' }}>
-                          <f.icon size={14} />{f.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          {NAV_ITEMS.map((item, idx) => {
+            const isActive = item.path
+              ? (item.path === '/speclab' ? location.pathname === '/speclab' : location.pathname.startsWith(item.path))
+              : false;
+            const isCat = !item.path;
+            return (
+              <div key={idx} className="relative">
+                {isCat ? (
+                  <button onClick={() => setFlyoutOpen(o => !o)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium transition-colors relative"
+                    style={{ color: flyoutOpen ? 'var(--sl-accent-copper)' : 'var(--sl-text-muted)' }}>
+                    <span className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r"
+                      style={{ background: 'var(--sl-accent-copper)', opacity: flyoutOpen ? 1 : 0 }} />
+                    <item.icon size={16} className="flex-shrink-0" />
+                    {expanded && <><span style={{ fontFamily: 'var(--sl-font-body)' }}>{item.label}</span>
+                    <ChevronRight size={10} className={`ml-auto transition-transform ${flyoutOpen ? 'rotate-90' : ''}`} /></>}
+                  </button>
+                ) : (
+                  <Link to={item.path!}
+                    className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium transition-colors relative"
+                    style={{ color: isActive ? 'var(--sl-accent-copper)' : 'var(--sl-text-muted)', background: isActive ? 'var(--sl-bg-panel-raised)' : undefined }}>
+                    <span className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r"
+                      style={{ background: 'var(--sl-accent-copper)', opacity: isActive ? 1 : 0 }} />
+                    <item.icon size={16} className="flex-shrink-0" />
+                    {expanded && <span style={{ fontFamily: 'var(--sl-font-body)' }}>{item.label}</span>}
+                  </Link>
+                )}
+                {isCat && flyoutOpen && expanded && item.flyout && (
+                  <div className="pl-8 pb-1 space-y-0.5">
+                    {item.flyout.map((f, fi) => (
+                      <Link key={fi} to={f.path}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] transition-colors"
+                        style={{ color: 'var(--sl-text-muted)', fontFamily: 'var(--sl-font-body)' }}>
+                        <f.icon size={12} />{f.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         {/* Mobile bottom bar */}
@@ -154,23 +154,14 @@ export function SpecLabShell({ children }: { children: ReactNode }) {
         </nav>
 
         {/* Main canvas */}
-        <main className="flex-1 overflow-y-auto pb-16 lg:pb-0 min-h-0 transition-all duration-200">
+        <main className="flex-1 overflow-y-auto pb-16 lg:pb-0 min-h-0"
+          style={{ paddingLeft: 'var(--sl-dock-collapsed)', marginLeft: '0' }}>
           {children}
         </main>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
