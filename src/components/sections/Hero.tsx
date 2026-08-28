@@ -47,11 +47,11 @@ export function Hero({ profileData }: HeroProps) {
 
             <div className="mb-4">
               <span className="block text-2xl sm:text-3xl text-[var(--color-text-muted)] font-bold tracking-tight mb-2">Hello, I'm</span>
-              <h1 className="font-display uppercase font-black leading-[0.85] tracking-[-0.04em] text-[15vw] md:text-[9vw] lg:text-[7.5rem] cursor-pointer transition-all duration-500 origin-left flex flex-col drop-shadow-[0_0_30px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] group">
+              <h1 className="font-display uppercase font-black leading-[0.85] tracking-[-0.04em] text-[11vw] sm:text-[12vw] md:text-[9vw] lg:text-[7.5rem] cursor-pointer transition-all duration-500 origin-left flex flex-col drop-shadow-[0_0_30px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] group">
                 <span className="bg-gradient-to-br from-gray-900 via-gray-700 to-gray-500 dark:from-white dark:via-gray-200 dark:to-gray-500 bg-clip-text text-transparent group-hover:from-primary group-hover:to-accent dark:group-hover:from-white dark:group-hover:to-primary transition-all duration-500">
-                  EMIL PUNNOOSE
+                  EMIL<br className="md:hidden" /> PUNNOOSE
                 </span>
-                <span className="text-primary text-[10vw] md:text-[6vw] lg:text-[5rem] tracking-[-0.02em] opacity-90 group-hover:opacity-100 transition-opacity">VARUGHESE</span>
+                <span className="text-primary text-[9vw] sm:text-[10vw] md:text-[6vw] lg:text-[5rem] tracking-[-0.02em] opacity-90 group-hover:opacity-100 transition-opacity">VARUGHESE</span>
               </h1>
             </div>
 
