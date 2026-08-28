@@ -482,7 +482,7 @@ export function Navigation({ isAiChatLayout = false }: { isAiChatLayout?: boolea
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-20 inset-x-4 glass-effect rounded-2xl p-4 flex flex-col space-y-2 shadow-2xl lg:hidden pointer-events-auto"
+            className="absolute top-20 inset-x-4 bg-[var(--color-background)]/95 backdrop-blur-2xl border border-[var(--color-border)] rounded-2xl p-4 flex flex-col space-y-2 shadow-[0_20px_40px_rgba(0,0,0,0.4)] lg:hidden pointer-events-auto z-[60]"
           >
             {links.map((link) => {
               const isActive = location.pathname === link.path;
