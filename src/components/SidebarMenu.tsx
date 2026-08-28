@@ -47,53 +47,56 @@ export function SidebarMenu({ isAiChatLayout = false }: { isAiChatLayout?: boole
           <span className="text-white font-bold tracking-widest">MENU</span>
         </Link>
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-2">
-          {mobileMenuOpen ? <X /> : <Menu />}
-        </button>
+         {mobileMenuOpen ? <X /> : <Menu />}
+</button>
+</div>
+
+{/* Desktop Sidebar & Mobile Menu Container */}
+<motion.nav
+  className="fixed top-0 left-0 h-full bg-[#212121] z-40 transition-transform duration-300 w-[260px] flex flex-col"
+>
+  {/* Yin Yang Logo Area */}
+  <div className="h-40 flex items-center justify-center pt-8">
+    <div className="w-24 h-24 rounded-full bg-white relative overflow-hidden flex shadow-2xl border-4 border-white/10">
+      {/* Left black half */}
+      <div className="w-1/2 h-full bg-[#212121] absolute left-0 top-0"></div>
+
+      {/* Top black circle */}
+      <div className="w-12 h-12 rounded-full bg-[#212121] absolute top-0 left-1/4 flex items-center justify-center">
+        <div className="w-3 h-3 rounded-full bg-white"></div>
       </div>
 
-      {/* Desktop Sidebar & Mobile Menu Container */}
-      <motion.nav 
-        className={\ixed top-0 left-0 h-full bg-[#212121] z-40 transition-transform duration-300 w-[260px] flex flex-col \\}
-      >
-        {/* Yin Yang Logo Area */}
-        <div className="h-40 flex items-center justify-center pt-8">
-          <div className="w-24 h-24 rounded-full bg-white relative overflow-hidden flex shadow-2xl border-4 border-white/10">
-            {/* Left black half */}
-            <div className="w-1/2 h-full bg-[#212121] absolute left-0 top-0"></div>
-            {/* Top black circle */}
-            <div className="w-12 h-12 rounded-full bg-[#212121] absolute top-0 left-1/4 flex items-center justify-center">
-               <div className="w-3 h-3 rounded-full bg-white"></div>
-            </div>
-            {/* Bottom white circle */}
-            <div className="w-12 h-12 rounded-full bg-white absolute bottom-0 left-1/4 flex items-center justify-center">
-               <div className="w-3 h-3 rounded-full bg-[#212121]"></div>
-            </div>
-          </div>
-        </div>
+      {/* Bottom white circle */}
+      <div className="w-12 h-12 rounded-full bg-white absolute bottom-0 left-1/4 flex items-center justify-center">
+        <div className="w-3 h-3 rounded-full bg-[#212121]"></div>
+      </div>
+    </div>
+  </div>
 
-        {/* Links */}
-        <div className="flex-1 mt-12 pl-6 flex flex-col gap-2">
-          {links.map((link) => {
-            const isActive = location.pathname === link.path;
-            const Icon = link.icon;
-            
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={\group flex items-center gap-4 py-4 pl-6 transition-all duration-300 \\}
-              >
-                <Icon className={\w-5 h-5 \\} />
-                <span className={\ont-bold tracking-widest text-sm \\}>
-                  {link.name}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+  {/* Links */}
+  <div className="flex-1 mt-12 pl-6 flex flex-col gap-2">
+    {links.map((link) => {
+      const isActive = location.pathname === link.path;
+      const Icon = link.icon;
 
-        {/* Bottom Actions */}
+      return (
+        <Link
+          key={link.name}
+          to={link.path}
+          onClick={() => setMobileMenuOpen(false)}
+          className="group flex items-center gap-4 py-4 pl-6 transition-all duration-300"
+        >
+          <Icon className="w-5 h-5" />
+
+          <span className="font-bold tracking-widest text-sm">
+            {link.name}
+          </span>
+        </Link>
+      );
+    })}
+  </div>
+
+  {/* Bottom Actions */}
         <div className="p-6 pb-8 space-y-4">
           <div className="flex items-center justify-center gap-4">
              <ThemeToggle />
