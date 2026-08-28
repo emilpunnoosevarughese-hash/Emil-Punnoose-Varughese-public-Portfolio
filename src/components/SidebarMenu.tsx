@@ -1,22 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Home, MessageSquare, BookOpen, DollarSign, Menu, X, FileText, Send, Bell, LogOut, LogIn, Cpu, User } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Home, MessageSquare, BookOpen, Menu, X, FileText, LogOut, LogIn, User } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { PaletteToggle } from './ui/PaletteToggle';
-import { useTheme } from '../contexts/ThemeContext';
+
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 
-export function SidebarMenu({ isAiChatLayout = false }: { isAiChatLayout?: boolean }) {
+export function SidebarMenu() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<FirebaseUser | null>(null);
-  
-  const { theme } = useTheme();
+
   // We use black for the sidebar as requested
-  const isDark = theme === 'dark' || theme === 'midnight';
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -84,7 +82,7 @@ export function SidebarMenu({ isAiChatLayout = false }: { isAiChatLayout?: boole
           key={link.name}
           to={link.path}
           onClick={() => setMobileMenuOpen(false)}
-          className="group flex items-center gap-4 py-4 pl-6 transition-all duration-300"
+          className={`group flex items-center gap-4 py-4 pl-6 transition-all duration-300 ${isActive ? 'text-white' : 'text-white/50 hover:text-white'}`}
         >
           <Icon className="w-5 h-5" />
 
