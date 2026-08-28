@@ -2,6 +2,7 @@ import { Github, Twitter, Linkedin } from './ui/SocialIcons';
 import { ArrowUp, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import secondBanner from '../assets/images/secondbanner.webp';
 
 export function Footer() {
   const { theme } = useTheme();
@@ -68,7 +69,7 @@ export function Footer() {
         
         {/* New Banner in Footer */}
         <div className="mb-16">
-          <img src="/src/assets/images/secondbanner.webp" alt="Second Banner" className="w-full rounded-2xl shadow-2xl border border-white/5 object-cover" />
+          <img src={secondBanner} alt="Second Banner" className="w-full rounded-2xl shadow-2xl border border-white/5 object-cover" />
         </div>
 
         {/* Bottom Bar */}
