@@ -18,13 +18,13 @@ export function Hero({ profileData }: HeroProps) {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex flex-col justify-center pt-24 pb-12 overflow-hidden">
+    <section className="relative min-h-[90vh] flex flex-col justify-start md:justify-center pt-32 md:pt-24 pb-12 overflow-hidden">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 md:mt-0 mt-[15vh]">
         <img 
           src={isDark ? profileData.images?.main : mainProfileLight} 
           alt="Hero Background" 
-          className={`w-full h-full object-contain object-right opacity-80 transition-opacity duration-500 ${isDark ? '' : 'mix-blend-multiply'}`}
+          className={`w-full h-full object-contain object-bottom md:object-right opacity-80 transition-opacity duration-500 ${isDark ? '' : 'mix-blend-multiply'}`}
         />
         {/* Gradient mask for the bottom to fade the image out */}
         <div className="absolute inset-x-0 bottom-0 h-[10%] bg-gradient-to-t from-[var(--color-background)] to-transparent pointer-events-none" />
